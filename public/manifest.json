@@ -1,0 +1,17 @@
+{
+    "name": "Oasys Finance",
+    "short_name": "Oasys",
+    "description": "Modern ERP and Finance Dashboard",
+    "id": "/",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3b82f6",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}

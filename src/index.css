@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #0d0df2;
+  --color-background-light: #f6f7f8;
+  --color-background-dark: #101022;
+  --font-display: 'Inter', sans-serif;
+}
