@@ -8,3 +8,24 @@
   --color-background-dark: #101022;
   --font-display: 'Inter', sans-serif;
 }
+
+/* Prevent white overscroll on mobile — background follows the app theme */
+html,
+body {
+  background-color: #f6f7f8;
+  overscroll-behavior: none;
+}
+
+html.dark,
+html.dark body {
+  background-color: #101022;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Espaço fixo para o BottomNav + barra de gestos (iOS) — evita “pulo” entre telas */
+@utility pb-app {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
