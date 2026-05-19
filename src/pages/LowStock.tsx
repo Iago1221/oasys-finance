@@ -59,7 +59,7 @@ const LowStock = () => {
 
                             <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 flex gap-2">
                                 <button
-                                    onClick={() => handleAction(item.id)}
+                                    onClick={() => /* handleAction(item.id) */ {} }
                                     className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-[10px] font-bold uppercase transition-all duration-200 ${actionDoneIds.includes(item.id)
                                         ? 'bg-emerald-500 text-white cursor-default'
                                         : 'bg-primary text-white hover:opacity-90 active:scale-95'
@@ -68,14 +68,14 @@ const LowStock = () => {
                                     <span className="material-symbols-outlined text-[16px]">
                                         {actionDoneIds.includes(item.id) ? 'check_circle' : 'shopping_cart_checkout'}
                                     </span>
-                                    {actionDoneIds.includes(item.id) ? 'Pedido Realizado' : 'Solicitar Reposição'}
+                                    {actionDoneIds.includes(item.id) ? 'Pedido Realizado' : 'Solicitar Reposição (Em Breve)'}
                                 </button>
                                 <button
-                                    onClick={() => navigate('/inventory/movements')}
+                                    onClick={() => /* navigate('/inventory/movements') */ {} }
                                     className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold py-2.5 rounded-lg uppercase hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-[16px]">history</span>
-                                    Histórico
+                                    Histórico (Em Breve)
                                 </button>
                             </div>
                         </div>

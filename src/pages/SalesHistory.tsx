@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import BackButton from '../components/BackButton';
-import SegmentedTabs from '../components/SegmentedTabs';
 import { useSalesHistory } from '../hooks';
 import type { SalesHistoryOrder } from '../types/sales';
 
 const SalesHistory = () => {
-    const { orders } = useSalesHistory();
-    const [activeFilter, setActiveFilter] = useState('Todos');
+    const { orders, isLoading, error } = useSalesHistory();
     const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<SalesHistoryOrder | null>(null);
 
@@ -31,13 +29,6 @@ const SalesHistory = () => {
         win.print();
     };
 
-    const filteredOrders = orders.filter(order => {
-        if (activeFilter === 'Todos') return true;
-        if (activeFilter === 'Faturados') return order.status === 'Faturado';
-        if (activeFilter === 'Pendentes') return order.status === 'Pendente';
-        return true;
-    });
-
     const toggleDetails = (id: number) => {
         setExpandedOrderId(expandedOrderId === id ? null : id);
     };
@@ -51,16 +42,15 @@ const SalesHistory = () => {
             </div>
 
             <main className="px-4">
-                <div className="flex items-center justify-between mb-4">
-                    <SegmentedTabs
-                        tabs={['Todos', 'Faturados', 'Pendentes']}
-                        activeTab={activeFilter}
-                        onChange={setActiveFilter}
-                    />
-                </div>
-
+                <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-4">Últimas 24 horas</p>
+                {error && <p className="text-sm text-red-600 mb-4">{error.message}</p>}
+                {isLoading ? (
+                    <p className="text-sm text-slate-500 text-center py-8">Carregando pedidos…</p>
+                ) : (
                 <div className="space-y-3">
-                    {filteredOrders.map((order) => (
+                    {orders.length === 0 ? (
+                        <p className="text-sm text-slate-500 text-center py-8">Nenhum pedido recente.</p>
+                    ) : orders.map((order) => (
                         <div key={order.id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800 transition-all duration-300">
                             <div
                                 onClick={() => toggleDetails(order.id)}
@@ -121,6 +111,7 @@ const SalesHistory = () => {
                         </div>
                     ))}
                 </div>
+                )}
             </main>
 
             <BottomNav />

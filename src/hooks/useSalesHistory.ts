@@ -1,24 +1,21 @@
-import { useCallback, useState } from 'react';
-import { MOCK_SALES_HISTORY_ORDERS } from '../data/mock/sales';
-import type { SalesHistoryOrder } from '../types/sales';
+import { useMemo } from 'react';
+import { useFinanceApi } from '../context/AuthContext';
+import { mapPedidoRecenteToHistory } from '../lib/mappers';
+import { useApiQuery } from './useApiQuery';
 
-/** Histórico de pedidos / vendas. */
 export function useSalesHistory() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [orders, setOrders] = useState<SalesHistoryOrder[]>(MOCK_SALES_HISTORY_ORDERS);
+  const api = useFinanceApi();
+  const query = useApiQuery(() => api.getVendaPedidosRecentes(), []);
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setOrders(MOCK_SALES_HISTORY_ORDERS);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar histórico'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const orders = useMemo(
+    () => (query.data ?? []).map(mapPedidoRecenteToHistory),
+    [query.data],
+  );
 
-  return { orders, setOrders, isLoading, error, refetch };
+  return {
+    orders,
+    isLoading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+  };
 }

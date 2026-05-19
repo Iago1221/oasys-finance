@@ -1,46 +1,33 @@
-import { useCallback, useMemo, useState } from 'react';
-import { MOCK_PRODUCTS } from '../data/mock/inventory';
+import { useMemo } from 'react';
+import { useDepositoContext } from '../context/DepositoContext';
+import { useFinanceApi } from '../context/AuthContext';
+import { mapProdutoSaldoToProductRow } from '../lib/mappers';
 import type { ProductRow } from '../types/inventory';
+import { useApiQuery } from './useApiQuery';
 
-/** Catálogo de produtos para consulta / busca local. */
 export function useProductCatalog() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [products, setProducts] = useState<ProductRow[]>(MOCK_PRODUCTS);
-  const [searchTerm, setSearchTerm] = useState('');
+  const api = useFinanceApi();
+  const { selectedDepositoId } = useDepositoContext();
 
-  const filteredProducts = useMemo(() => {
-    const q = searchTerm.toLowerCase();
-    if (!q) return products;
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q),
-    );
-  }, [products, searchTerm]);
+  const query = useApiQuery(
+    () => {
+      if (selectedDepositoId == null) {
+        return Promise.resolve([]);
+      }
+      return api.getEstoqueProdutosSaldo(selectedDepositoId);
+    },
+    [selectedDepositoId],
+  );
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // const list = await api.inventory.products()
-      setProducts(MOCK_PRODUCTS);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar produtos'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const products: ProductRow[] = useMemo(
+    () => (query.data ?? []).map((p, i) => mapProdutoSaldoToProductRow(p, i)),
+    [query.data],
+  );
 
   return {
     products,
-    filteredProducts,
-    searchTerm,
-    setSearchTerm,
-    setProducts,
-    isLoading,
-    error,
-    refetch,
+    isLoading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
   };
 }

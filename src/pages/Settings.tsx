@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import InstallAppButton from '../components/InstallAppButton';
+import { useAuth } from '../context/AuthContext';
 import { useIntegrations } from '../hooks';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
-    // Inicializa o estado baseado na classe presente no documento
+    const navigate = useNavigate();
+    const { logout } = useAuth();
     const [isDarkMode, setIsDarkMode] = useState(() => {
         return document.documentElement.classList.contains('dark');
     });
@@ -118,7 +121,7 @@ const Settings = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setIsBankingActive(!isBankingActive)}
+                                onClick={() => void setIsBankingActive(!isBankingActive)}
                                 className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isBankingActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
                                     }`}
                             >
@@ -140,7 +143,7 @@ const Settings = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setIsLogisticsActive(!isLogisticsActive)}
+                                onClick={() => void setIsLogisticsActive(!isLogisticsActive)}
                                 className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isLogisticsActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
                                     }`}
                             >
@@ -162,7 +165,7 @@ const Settings = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setIsCRMActive(!isCRMActive)}
+                                onClick={() => void setIsCRMActive(!isCRMActive)}
                                 className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isCRMActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
                                     }`}
                             >
@@ -171,6 +174,20 @@ const Settings = () => {
                             </button>
                         </div>
                     </div>
+                </section>
+
+                <section className="space-y-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">Sessão</h3>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            logout();
+                            navigate('/login');
+                        }}
+                        className="w-full bg-red-500/10 text-red-600 dark:text-red-400 font-bold py-4 rounded-xl border border-red-500/20"
+                    >
+                        Sair da conta
+                    </button>
                 </section>
             </main>
 

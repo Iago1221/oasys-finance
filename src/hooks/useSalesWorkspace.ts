@@ -1,44 +1,35 @@
-import { useCallback, useState } from 'react';
-import {
-  MOCK_HIGH_VALUE_ORDERS,
-  MOCK_ISSUED_NOTES_PREVIEW,
-  MOCK_SALES_NOTE_ERRORS,
-} from '../data/mock/sales';
-import type { IssuedNotePreview, SalesNoteError, SalesOrderPreview } from '../types/sales';
+import { useMemo } from 'react';
+import { useFinanceApi } from '../context/AuthContext';
+import type { VendaFiscal, VendaResumo } from '../api/types';
+import { mapPedidoRecenteToPreview } from '../lib/mappers';
+import type { SalesOrderPreview } from '../types/sales';
+import { useApiQuery } from './useApiQuery';
 
-export const SALES_TABS = ['Painel', 'Documentos', 'Impostos'] as const;
+export const SALES_TABS = ['Painel'] as const;
 
-/** Dados das abas de Vendas & Faturamento. */
 export function useSalesWorkspace() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [highValueOrders, setHighValueOrders] =
-    useState<SalesOrderPreview[]>(MOCK_HIGH_VALUE_ORDERS);
-  const [errorNotes, setErrorNotes] = useState<SalesNoteError[]>(MOCK_SALES_NOTE_ERRORS);
-  const [issuedNotesPreview, setIssuedNotesPreview] =
-    useState<IssuedNotePreview[]>(MOCK_ISSUED_NOTES_PREVIEW);
+  const api = useFinanceApi();
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setHighValueOrders(MOCK_HIGH_VALUE_ORDERS);
-      setErrorNotes(MOCK_SALES_NOTE_ERRORS);
-      setIssuedNotesPreview(MOCK_ISSUED_NOTES_PREVIEW);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar vendas'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const resumoQuery = useApiQuery<VendaResumo>(() => api.getVendaResumo(), []);
+  const fiscalQuery = useApiQuery<VendaFiscal>(() => api.getVendaFiscal(), []);
+  const pedidosQuery = useApiQuery(() => api.getVendaPedidosRecentes(), []);
+
+  const highValueOrders: SalesOrderPreview[] = useMemo(
+    () => (pedidosQuery.data ?? []).map(mapPedidoRecenteToPreview),
+    [pedidosQuery.data],
+  );
+
+  const isLoading = resumoQuery.isLoading || fiscalQuery.isLoading || pedidosQuery.isLoading;
+  const error = resumoQuery.error ?? fiscalQuery.error ?? pedidosQuery.error;
+
+  const refetch = async () => {
+    await Promise.all([resumoQuery.refetch(), fiscalQuery.refetch(), pedidosQuery.refetch()]);
+  };
 
   return {
+    resumo: resumoQuery.data,
+    fiscal: fiscalQuery.data,
     highValueOrders,
-    errorNotes,
-    issuedNotesPreview,
-    setHighValueOrders,
-    setErrorNotes,
-    setIssuedNotesPreview,
     isLoading,
     error,
     refetch,

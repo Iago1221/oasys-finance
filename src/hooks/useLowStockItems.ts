@@ -1,24 +1,36 @@
-import { useCallback, useState } from 'react';
-import { MOCK_LOW_STOCK_FULL } from '../data/mock/inventory';
+import { useMemo } from 'react';
+import { useDepositoContext } from '../context/DepositoContext';
+import { useFinanceApi } from '../context/AuthContext';
+import { mapProdutoSaldoToLowStockFull } from '../lib/mappers';
 import type { LowStockAlertFull } from '../types/inventory';
+import { useApiQuery } from './useApiQuery';
 
-/** Itens em alerta de estoque baixo. */
 export function useLowStockItems() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [items, setItems] = useState<LowStockAlertFull[]>(MOCK_LOW_STOCK_FULL);
+  const api = useFinanceApi();
+  const { selectedDepositoId } = useDepositoContext();
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setItems(MOCK_LOW_STOCK_FULL);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar alertas'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const query = useApiQuery(
+    () => {
+      if (selectedDepositoId == null) {
+        return Promise.resolve([]);
+      }
+      return api.getEstoqueProdutosSaldo(selectedDepositoId);
+    },
+    [selectedDepositoId],
+  );
 
-  return { items, setItems, isLoading, error, refetch };
+  const items: LowStockAlertFull[] = useMemo(
+    () =>
+      (query.data ?? [])
+        .map((p, i) => mapProdutoSaldoToLowStockFull(p, i))
+        .filter((a): a is LowStockAlertFull => a != null),
+    [query.data],
+  );
+
+  return {
+    items,
+    isLoading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+  };
 }

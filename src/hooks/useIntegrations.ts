@@ -1,77 +1,84 @@
 import { useCallback, useEffect, useState } from 'react';
-import { INTEGRATIONS_CHANGED_EVENT, STORAGE_KEYS } from '../lib/storageKeys';
-
-function readBanking(): boolean {
-  const saved = localStorage.getItem(STORAGE_KEYS.isBankingActive);
-  return saved !== null ? JSON.parse(saved) : true;
-}
-
-function readLogistics(): boolean {
-  const saved = localStorage.getItem(STORAGE_KEYS.isLogisticsActive);
-  return saved !== null ? JSON.parse(saved) : false;
-}
-
-function readCRM(): boolean {
-  const saved = localStorage.getItem(STORAGE_KEYS.isCRMActive);
-  return saved !== null ? JSON.parse(saved) : false;
-}
+import type { FinanceAppConfig } from '../api/types';
+import { useFinanceApi } from '../context/AuthContext';
+import { normalizeFinanceAppConfig } from '../lib/mappers';
+import { INTEGRATIONS_CHANGED_EVENT } from '../lib/storageKeys';
 
 function dispatchIntegrationsChanged() {
   window.dispatchEvent(new Event(INTEGRATIONS_CHANGED_EVENT));
 }
 
-/**
- * Integrações persistidas (Oasys Pay, Logística, CRM).
- * Troque a implementação interna por chamadas à API mantendo a mesma interface.
- */
+const DEFAULT_CONFIG: FinanceAppConfig = {
+  oasysPay: false,
+  logistica: false,
+  oasysCrm: false,
+};
+
 export function useIntegrations() {
-  const [isBankingActive, setIsBankingActiveState] = useState(readBanking);
-  const [isLogisticsActive, setIsLogisticsActiveState] = useState(readLogistics);
-  const [isCRMActive, setIsCRMActiveState] = useState(readCRM);
+  const api = useFinanceApi();
+  const [config, setConfig] = useState<FinanceAppConfig>(DEFAULT_CONFIG);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const applyConfig = useCallback((raw: unknown) => {
+    setConfig(normalizeFinanceAppConfig(raw));
+    dispatchIntegrationsChanged();
+  }, []);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await api.getConfiguracao();
+      applyConfig(data);
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error('Falha ao carregar configurações'));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [api, applyConfig]);
 
   useEffect(() => {
-    const sync = () => {
-      setIsBankingActiveState(readBanking());
-      setIsLogisticsActiveState(readLogistics());
-      setIsCRMActiveState(readCRM());
-    };
-    window.addEventListener('storage', sync);
-    window.addEventListener(INTEGRATIONS_CHANGED_EVENT, sync);
-    return () => {
-      window.removeEventListener('storage', sync);
-      window.removeEventListener(INTEGRATIONS_CHANGED_EVENT, sync);
-    };
-  }, []);
+    void load();
+  }, [load]);
 
-  const setIsBankingActive = useCallback((value: boolean) => {
-    setIsBankingActiveState(value);
-    localStorage.setItem(STORAGE_KEYS.isBankingActive, JSON.stringify(value));
-    dispatchIntegrationsChanged();
-  }, []);
+  const setIsBankingActive = useCallback(
+    async (value: boolean) => {
+      const data = await api.setOasysPay(value);
+      applyConfig(data);
+    },
+    [api, applyConfig],
+  );
 
-  const setIsLogisticsActive = useCallback((value: boolean) => {
-    setIsLogisticsActiveState(value);
-    localStorage.setItem(STORAGE_KEYS.isLogisticsActive, JSON.stringify(value));
-    dispatchIntegrationsChanged();
-  }, []);
+  const setIsLogisticsActive = useCallback(
+    async (value: boolean) => {
+      const data = await api.setLogistica(value);
+      applyConfig(data);
+    },
+    [api, applyConfig],
+  );
 
-  const setIsCRMActive = useCallback((value: boolean) => {
-    setIsCRMActiveState(value);
-    localStorage.setItem(STORAGE_KEYS.isCRMActive, JSON.stringify(value));
-    dispatchIntegrationsChanged();
-  }, []);
+  const setIsCRMActive = useCallback(
+    async (value: boolean) => {
+      const data = await api.setOasysCrm(value);
+      applyConfig(data);
+    },
+    [api, applyConfig],
+  );
 
   return {
-    isBankingActive,
-    isLogisticsActive,
-    isCRMActive,
+    isBankingActive: config.oasysPay,
+    isLogisticsActive: config.logistica,
+    isCRMActive: config.oasysCrm,
     setIsBankingActive,
     setIsLogisticsActive,
     setIsCRMActive,
+    isLoading,
+    error,
+    refetch: load,
   };
 }
 
-/** Somente leitura — útil em telas que não alteram integrações */
 export function useIntegrationsReadOnly() {
   const { isBankingActive, isLogisticsActive, isCRMActive } = useIntegrations();
   return { isBankingActive, isLogisticsActive, isCRMActive };

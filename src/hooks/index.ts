@@ -1,8 +1,8 @@
-export { useActivities } from './useActivities';
+export { useDashboardSummary } from './useDashboardSummary';
 export { useFinanceCatalog } from './useFinanceCatalog';
+export { useFinanceFluxo } from './useFinanceFluxo';
 export { useIntegrations, useIntegrationsReadOnly } from './useIntegrations';
 export { useInventoryMonitor } from './useInventoryMonitor';
-export { useIssuedNotes } from './useIssuedNotes';
 export { useLowStockItems } from './useLowStockItems';
 export { usePendingIssuesData } from './usePendingIssuesData';
 export { useProductCatalog } from './useProductCatalog';

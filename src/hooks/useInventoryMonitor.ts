@@ -1,35 +1,65 @@
-import { useCallback, useState } from 'react';
-import { MOCK_INVENTORY_RECENT, MOCK_LOW_STOCK_ALERTS } from '../data/mock/inventory';
+import { useMemo } from 'react';
+import { useDepositoContext } from '../context/DepositoContext';
+import { useFinanceApi } from '../context/AuthContext';
+import {
+  mapMovimentacaoEstoqueToSummary,
+  mapProdutoSaldoToLowStockAlert,
+} from '../lib/mappers';
 import type { InventoryMovementSummary, LowStockAlert } from '../types/inventory';
+import { useApiQuery } from './useApiQuery';
 
-/** Painel principal de estoque (alertas + movimentações recentes). */
 export function useInventoryMonitor() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [lowStockAlerts, setLowStockAlerts] = useState<LowStockAlert[]>(MOCK_LOW_STOCK_ALERTS);
-  const [recentMovements, setRecentMovements] = useState<InventoryMovementSummary[]>(
-    MOCK_INVENTORY_RECENT,
+  const api = useFinanceApi();
+  const { selectedDepositoId } = useDepositoContext();
+
+  const movQuery = useApiQuery(
+    () => {
+      if (selectedDepositoId == null) {
+        return Promise.resolve([]);
+      }
+      return api.getEstoqueMovimentacoesRecentes(selectedDepositoId);
+    },
+    [selectedDepositoId],
   );
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // await api.inventory.dashboard()
-      setLowStockAlerts(MOCK_LOW_STOCK_ALERTS);
-      setRecentMovements(MOCK_INVENTORY_RECENT);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar estoque'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const saldoQuery = useApiQuery(
+    () => {
+      if (selectedDepositoId == null) {
+        return Promise.resolve([]);
+      }
+      return api.getEstoqueProdutosSaldo(selectedDepositoId);
+    },
+    [selectedDepositoId],
+  );
+
+  const itensQuery = useApiQuery(() => api.getEstoqueItensAtivos(), []);
+
+  const recentMovements: InventoryMovementSummary[] = useMemo(
+    () => (movQuery.data ?? []).map(mapMovimentacaoEstoqueToSummary),
+    [movQuery.data],
+  );
+
+  const lowStockAlerts: LowStockAlert[] = useMemo(
+    () =>
+      (saldoQuery.data ?? [])
+        .map((p, i) => mapProdutoSaldoToLowStockAlert(p, i))
+        .filter((a): a is LowStockAlert => a != null),
+    [saldoQuery.data],
+  );
+
+  const activeItemsCount = itensQuery.data?.length ?? 0;
+
+  const isLoading = movQuery.isLoading || saldoQuery.isLoading || itensQuery.isLoading;
+  const error = movQuery.error ?? saldoQuery.error ?? itensQuery.error;
+
+  const refetch = async () => {
+    await Promise.all([movQuery.refetch(), saldoQuery.refetch(), itensQuery.refetch()]);
+  };
 
   return {
     lowStockAlerts,
     recentMovements,
-    setLowStockAlerts,
-    setRecentMovements,
+    activeItemsCount,
     isLoading,
     error,
     refetch,

@@ -1,24 +1,33 @@
-import { useCallback, useState } from 'react';
-import { MOCK_STOCK_MOVEMENTS } from '../data/mock/inventory';
+import { useMemo } from 'react';
+import { useDepositoContext } from '../context/DepositoContext';
+import { useFinanceApi } from '../context/AuthContext';
+import { mapMovimentacaoEstoqueToDetail } from '../lib/mappers';
 import type { InventoryMovementDetail } from '../types/inventory';
+import { useApiQuery } from './useApiQuery';
 
-/** Lista detalhada de movimentações de estoque. */
 export function useStockMovements() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [movements, setMovements] = useState<InventoryMovementDetail[]>(MOCK_STOCK_MOVEMENTS);
+  const api = useFinanceApi();
+  const { selectedDepositoId } = useDepositoContext();
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      setMovements(MOCK_STOCK_MOVEMENTS);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('Falha ao carregar movimentações'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const query = useApiQuery(
+    () => {
+      if (selectedDepositoId == null) {
+        return Promise.resolve([]);
+      }
+      return api.getEstoqueMovimentacoesRecentes(selectedDepositoId);
+    },
+    [selectedDepositoId],
+  );
 
-  return { movements, setMovements, isLoading, error, refetch };
+  const movements: InventoryMovementDetail[] = useMemo(
+    () => (query.data ?? []).map(mapMovimentacaoEstoqueToDetail),
+    [query.data],
+  );
+
+  return {
+    movements,
+    isLoading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+  };
 }
