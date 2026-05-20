@@ -155,7 +155,7 @@ export default function Sales() {
                   <p className="text-sm text-slate-500 text-center py-6">Nenhum pedido recente.</p>
                 ) : (
                   <div className="space-y-3">
-                    {highValueOrders.map((order) => (
+                    {highValueOrders.slice(0, 3).map((order) => (
                       <div
                         key={order.id}
                         className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800"

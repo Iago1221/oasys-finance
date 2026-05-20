@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
-import InstallAppButton from '../components/InstallAppButton';
+import InstallAppButton, { canOfferAppInstall } from '../components/InstallAppButton';
 import { useAuth } from '../context/AuthContext';
-import { useIntegrations } from '../hooks';
 import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
@@ -13,14 +12,7 @@ const Settings = () => {
         return document.documentElement.classList.contains('dark');
     });
 
-    const {
-        isBankingActive,
-        isLogisticsActive,
-        isCRMActive,
-        setIsBankingActive,
-        setIsLogisticsActive,
-        setIsCRMActive,
-    } = useIntegrations();
+    const showInstallApp = canOfferAppInstall();
 
     // Efeito para sincronizar o tema com o DOM
     useEffect(() => {
@@ -72,15 +64,17 @@ const Settings = () => {
                 <section className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">Ajustes do App</h3>
                     <div className="bg-white dark:bg-slate-900 rounded-lg divide-y divide-slate-100 dark:divide-slate-800 shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center justify-between p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-[20px]">download</span>
+                        {showInstallApp && (
+                            <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-[20px]">download</span>
+                                    </div>
+                                    <span className="font-medium">Instalar aplicativo</span>
                                 </div>
-                                <span className="font-medium">Instalar aplicativo</span>
+                                <InstallAppButton />
                             </div>
-                            <InstallAppButton />
-                        </div>
+                        )}
                         {/* Dark Mode Toggle */}
                         <div className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
@@ -115,18 +109,18 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Oasys Pay</span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isBankingActive ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                        {isBankingActive ? 'Ativa' : 'Inativa'}
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        Inativa
                                     </span>
                                 </div>
                             </div>
                             <button
-                                onClick={() => void setIsBankingActive(!isBankingActive)}
-                                className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isBankingActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
-                                    }`}
+                                type="button"
+                                disabled
+                                aria-disabled="true"
+                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
                             >
-                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 transform ${isBankingActive ? 'translate-x-5' : 'translate-x-0'
-                                    }`}></div>
+                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
                             </button>
                         </div>
                         {/* Logistics */}
@@ -137,18 +131,18 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Logística</span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isLogisticsActive ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                        {isLogisticsActive ? 'Ativa' : 'Inativa'}
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        Inativa
                                     </span>
                                 </div>
                             </div>
                             <button
-                                onClick={() => void setIsLogisticsActive(!isLogisticsActive)}
-                                className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isLogisticsActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
-                                    }`}
+                                type="button"
+                                disabled
+                                aria-disabled="true"
+                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
                             >
-                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 transform ${isLogisticsActive ? 'translate-x-5' : 'translate-x-0'
-                                    }`}></div>
+                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
                             </button>
                         </div>
                         {/* CRM */}
@@ -159,18 +153,18 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Oasys CRM</span>
-                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isCRMActive ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                        {isCRMActive ? 'Ativa' : 'Inativa'}
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        Inativa
                                     </span>
                                 </div>
                             </div>
                             <button
-                                onClick={() => void setIsCRMActive(!isCRMActive)}
-                                className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isCRMActive ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
-                                    }`}
+                                type="button"
+                                disabled
+                                aria-disabled="true"
+                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
                             >
-                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 transform ${isCRMActive ? 'translate-x-5' : 'translate-x-0'
-                                    }`}></div>
+                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
                             </button>
                         </div>
                     </div>

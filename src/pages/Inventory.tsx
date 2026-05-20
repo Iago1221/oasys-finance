@@ -88,7 +88,7 @@ export default function Inventory() {
                 {lowStockAlerts.length === 0 ? (
                   <p className="text-sm text-slate-500">Nenhum alerta de estoque baixo.</p>
                 ) : (
-                  lowStockAlerts.map((item) => (
+                  lowStockAlerts.slice(0, 3).map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                       <div className="flex items-center gap-3 min-w-0">
                         <img className="h-11 w-11 rounded-xl object-cover" src={item.image} alt={item.name} />
@@ -116,7 +116,7 @@ export default function Inventory() {
                 {recentMovements.length === 0 ? (
                   <p className="p-4 text-sm text-slate-500">Sem movimentações nas últimas 24h.</p>
                 ) : (
-                  recentMovements.map((mov) => (
+                  recentMovements.slice(0, 3).map((mov) => (
                     <div key={mov.id} className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div

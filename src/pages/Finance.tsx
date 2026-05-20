@@ -88,11 +88,11 @@ export default function Finance() {
           </div>
 
           <div className="space-y-3">
-            {payables.slice(0, 5).map((item) => (
+            {payables.slice(0, 3).map((item) => (
               <div key={item.id} className={`flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border-l-4 ${borderColorClass[item.color] ?? 'border-slate-300'}`}>
                 <div className="flex-1">
                   <p className="text-sm font-bold">{item.entity}</p>
-                  <p className="text-[10px] text-slate-500 italic">{item.type}</p>
+                  {/* <p className="text-[10px] text-slate-500 italic">{item.type}</p> */}
                   <p className="text-lg font-bold mt-2">{mask(formatCurrency(item.value))}</p>
                 </div>
                 <span className={`text-[9px] font-bold h-fit px-2 py-0.5 rounded-full uppercase ${statusColorClass[item.color] ?? ''}`}>{item.status}</span>
@@ -107,11 +107,11 @@ export default function Finance() {
             <button type="button" onClick={() => navigate('/finance/pending?type=receber')} className="text-primary text-xs font-bold">Ver Todas</button>
           </div>
           <div className="space-y-3">
-            {receivables.slice(0, 5).map((item) => (
+            {receivables.slice(0, 3).map((item) => (
               <div key={item.id} className={`flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border-l-4 ${borderColorClass[item.color] ?? 'border-slate-300'}`}>
                 <div className="flex-1">
                   <p className="text-sm font-bold">{item.entity}</p>
-                  <p className="text-xs text-slate-500 italic">{item.type}</p>
+                  {/* <p className="text-xs text-slate-500 italic">{item.type}</p> */}
                   <p className="text-lg font-bold mt-1">{mask(item.value)}</p>
                 </div>
                 <span className={`text-[10px] font-bold h-fit px-2 py-0.5 rounded-full uppercase ${statusColorClass[item.color] ?? ''}`}>{item.status}</span>
@@ -129,7 +129,7 @@ export default function Finance() {
             {movements.length === 0 ? (
               <p className="p-4 text-sm text-slate-500">Sem movimentações nas últimas 24h.</p>
             ) : (
-              movements.slice(0, 5).map((mov) => (
+              movements.slice(0, 3).map((mov) => (
                 <div key={mov.id} className="p-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold">{mov.type}</p>

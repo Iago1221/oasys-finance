@@ -1,47 +1,18 @@
-import { useEffect, useState } from 'react';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
-};
+export { canOfferAppInstall, isAppInstalled } from '../lib/pwaInstall';
 
 const InstallAppButton = () => {
-  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(false);
+  const { canPrompt, install } = usePwaInstall();
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallEvent(event as BeforeInstallPromptEvent);
-    };
-
-    const handleInstalled = () => {
-      setInstalled(true);
-      setInstallEvent(null);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleInstalled);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleInstalled);
-    };
-  }, []);
-
-  if (!installEvent || installed) {
+  if (!canPrompt) {
     return null;
   }
 
-  const handleInstall = async () => {
-    await installEvent.prompt();
-    await installEvent.userChoice;
-    setInstallEvent(null);
-  };
-
   return (
     <button
-      onClick={handleInstall}
+      type="button"
+      onClick={() => void install()}
       className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-primary/20"
     >
       <span className="material-symbols-outlined text-sm">download</span>

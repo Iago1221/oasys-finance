@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
-import InstallAppButton from '../components/InstallAppButton';
+import InstallAppButton, { canOfferAppInstall } from '../components/InstallAppButton';
 import { useDashboardSummary } from '../hooks';
 import { formatCurrency } from '../lib/mappers';
 
@@ -22,9 +22,11 @@ const Dashboard = () => {
         <Header title="Painel Oasys" />
 
         <main className="flex-1 p-4 space-y-6">
-          <div className="flex justify-end">
-            <InstallAppButton />
-          </div>
+          {canOfferAppInstall() && (
+            <div className="flex justify-end">
+              <InstallAppButton />
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 dark:bg-red-500/10 rounded-lg px-4 py-3">{error.message}</p>
