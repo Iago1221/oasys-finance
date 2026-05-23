@@ -5,4 +5,4 @@
  * Ex.: dev → `localhost:8080` (front em `http://oasys.localhost:5173`)
  * Ex.: produção → `erp.cliente.com.br`
  */
-export const BASE_URL = 'localhost:8080';
+export const BASE_URL = 'oasystecnologia.com';
