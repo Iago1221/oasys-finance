@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { FinanceApiError } from '../api/FinanceApiClient';
 import { useAuth } from '../context/AuthContext';
-import { getApiOrigin, getTenantPrefix } from '../lib/tenant';
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -35,26 +34,12 @@ export default function Login() {
     }
   };
 
-  const tenantLabel = getTenantPrefix();
-  let apiLabel = '';
-  try {
-    apiLabel = getApiOrigin();
-  } catch {
-    apiLabel = 'Configure VITE_API_ROOT_DOMAIN';
-  }
-
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg p-8 space-y-6">
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-black tracking-tight">Painel Oasys</h1>
-          <p className="text-xs text-slate-500">Entre com suas credenciais do ERP</p>
+          <h1 className="text-2xl font-black tracking-tight">Oasys Finance</h1>
         </div>
-        <p className="text-[10px] text-center text-slate-400 uppercase tracking-wider">
-          Tenant: <span className="font-bold text-slate-600 dark:text-slate-300">{tenantLabel}</span>
-          <br />
-          API: <span className="font-mono text-[9px] break-all">{apiLabel}</span>
-        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

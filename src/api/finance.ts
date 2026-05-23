@@ -14,8 +14,12 @@ import type {
   VendaResumo,
 } from './types';
 
-export function createFinanceApi(token: string, baseUrl: string) {
-  const client = new FinanceApiClient({ baseUrl, token });
+export function createFinanceApi(
+  token: string,
+  baseUrl: string,
+  onUnauthorized?: () => void,
+) {
+  const client = new FinanceApiClient({ baseUrl, token, onUnauthorized });
 
   return {
     getVendaResumo: () => client.get<VendaResumo>('vendaResumo'),

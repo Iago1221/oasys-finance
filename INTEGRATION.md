@@ -2,30 +2,30 @@
 
 ## Tenant
 
-O painel resolve o tenant **somente pelo primeiro segmento do host** do front-end (não há tenant em variável de ambiente):
+O painel resolve o tenant **somente pelo primeiro segmento do host** do front-end:
 
 - Front: `https://teste.minhaurlfrontend` → tenant `teste`
-- API: `https://teste.urldobackend` (configure `VITE_API_ROOT_DOMAIN=urldobackend`)
+- API: `https://teste.{BASE_URL}` (ajuste `BASE_URL` em `src/lib/config.ts`)
 
 Sem subdomínio (`localhost`, IP ou domínio sem prefixo), o app exibe **404**.
 
 Em desenvolvimento local:
 
 - Front: `http://oasys.localhost:5173` (tenant na URL do front)
-- API direta: `http://oasys.localhost:8080` (`VITE_API_ROOT_DOMAIN=localhost:8080`, `VITE_API_PROTOCOL=http`)
-- O ERP precisa responder nesse host (virtual host / DNS local); o tenant vem do header `Host`
+- API: `http://oasys.localhost:8080` com `BASE_URL = 'localhost:8080'` em `src/lib/config.ts`
+- O ERP precisa responder nesse host (virtual host / DNS local)
 
-Use `VITE_API_PROTOCOL=http` no `.env` — o ERP local não costuma ter HTTPS.
+## Configuração da API
 
-## Variáveis de ambiente
-
-Copie `.env.example` para `.env.local` e ajuste os valores.
+Edite a constante `BASE_URL` em `src/lib/config.ts` (host[:porta] do back-end, sem protocolo). O protocolo é `http` em ambiente local e `https` em produção.
 
 ## Autenticação
 
-1. `POST https://{tenant}.{dominio}/api/login` com `{ "login", "password" }`
+1. `POST https://{tenant}.{BASE_URL}/api/login` com `{ "usuario", "senha" }`
 2. Guarde o token retornado em `sessionStorage`
-3. Envie `oasys-token` em todas as requisições `GET/POST` para `/api/finance/*`
+3. Envie `oasys-token` em todas as requisições `GET/POST` para `/api/finance/*` e `/api/app/*`
+4. Após o login, consulte o perfil: `GET /api/app/usuario?email={email}` (mesmo header `oasys-token`)
+5. Respostas `401` / JWT expirado (`success: false`, `status: 401`) disparam logout automático e redirecionamento para `/login`
 
 ## CORS
 

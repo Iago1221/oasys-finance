@@ -33,7 +33,7 @@ export const MOCK_HIGH_VALUE_ORDERS: SalesOrderPreview[] = [
     client: 'Petrobras Distrib.',
     time: '8h atrás',
     value: 'R$ 42.100,00',
-    status: 'Faturado',
+    status: 'Concluído',
     items: '500x Carregador Turbo 20W',
     ref: '#SO-8835',
     color: 'emerald',
@@ -119,7 +119,6 @@ export const MOCK_SALES_HISTORY_ORDERS: SalesHistoryOrder[] = [
     status: 'Pendente',
     ref: '#SO-8842',
     items: '15x Pro Watch Series X, 5x Audio-Z Headset',
-    tax: 'R$ 1.120,50 (ICMS)',
     color: 'blue',
   },
   {
@@ -131,7 +130,6 @@ export const MOCK_SALES_HISTORY_ORDERS: SalesHistoryOrder[] = [
     status: 'Pendente',
     ref: '#SO-8839',
     items: '2x MacBook Pro M2, 10x Cabo USB-C',
-    tax: 'R$ 802,84 (ICMS)',
     color: 'blue',
   },
   {
@@ -140,10 +138,9 @@ export const MOCK_SALES_HISTORY_ORDERS: SalesHistoryOrder[] = [
     date: 'Ontem',
     time: '16:45',
     value: 'R$ 42.100,00',
-    status: 'Faturado',
+    status: 'Concluído',
     ref: '#SO-8835',
     items: '500x Carregador Turbo 20W',
-    tax: 'R$ 3.789,00 (ICMS)',
     color: 'emerald',
   },
   {
@@ -155,7 +152,6 @@ export const MOCK_SALES_HISTORY_ORDERS: SalesHistoryOrder[] = [
     status: 'Cancelado',
     ref: '#SO-8830',
     items: '40x Teclado Mecânico RGB',
-    tax: 'R$ 504,00 (ICMS)',
     color: 'red',
   },
   {
@@ -164,10 +160,9 @@ export const MOCK_SALES_HISTORY_ORDERS: SalesHistoryOrder[] = [
     date: '03/03',
     time: '15:20',
     value: 'R$ 15.800,00',
-    status: 'Faturado',
+    status: 'Concluído',
     ref: '#SO-8825',
     items: '10x MacBook Pro M2',
-    tax: 'R$ 1.422,00 (ICMS)',
     color: 'emerald',
   },
 ];

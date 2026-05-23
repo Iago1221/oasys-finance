@@ -12,9 +12,7 @@ const Dashboard = () => {
 
   const pipelineTotal =
     (resumo?.totalOrcamentos ?? 0) +
-    (resumo?.totalPedidos ?? 0) +
-    (resumo?.totalPedidosConcluidos ?? 0) +
-    (resumo?.totalPedidosFaturados ?? 0);
+    (resumo?.totalPedidos ?? 0);
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans min-h-screen">

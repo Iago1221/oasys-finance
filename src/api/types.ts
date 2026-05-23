@@ -34,6 +34,7 @@ export type VendaFiscal = {
 
 export type PedidoRecente = {
   id: number;
+  status: number;
   valorTotal: number;
   dataEmissao: string;
   tempoRelativo: string | null;
@@ -155,4 +156,17 @@ export type FinanceAppConfig = {
   oasysPay: boolean;
   logistica: boolean;
   oasysCrm: boolean;
+};
+
+export type AppUsuario = {
+  id: number;
+  nome: string;
+  email: string;
+  acessoErp: boolean;
+  acessoCrm: boolean;
+  acessoGestao: boolean;
+  acessoVarejo: boolean;
+  acessoIndustria: boolean;
+  acessoNeuron: boolean;
+  situacao: number;
 };

@@ -1,40 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import InstallAppButton, { canOfferAppInstall } from '../components/InstallAppButton';
 import { useAuth } from '../context/AuthContext';
+import { useIntegrations } from '../hooks/useIntegrations';
 import { useNavigate } from 'react-router-dom';
+import { applyTheme, getStoredTheme } from '../lib/theme';
+
+const MODULOS_ACESSO = [
+  { key: 'acessoErp' as const, label: 'ERP', icon: 'business' },
+  { key: 'acessoCrm' as const, label: 'CRM', icon: 'hub' },
+  { key: 'acessoGestao' as const, label: 'Gestão', icon: 'analytics' },
+  { key: 'acessoVarejo' as const, label: 'Varejo', icon: 'storefront' },
+  { key: 'acessoIndustria' as const, label: 'Indústria', icon: 'factory' },
+  { key: 'acessoNeuron' as const, label: 'Neuron', icon: 'psychology' },
+];
+
+function usuarioAtivo(situacao: number): boolean {
+  return situacao === 1;
+}
 
 const Settings = () => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        return document.documentElement.classList.contains('dark');
-    });
+    const { logout, user, userLoading, userError } = useAuth();
+    const {
+        isBankingActive,
+        isLogisticsActive,
+        isCRMActive,
+        isLoading: integrationsLoading,
+    } = useIntegrations();
+    const [isDarkMode, setIsDarkMode] = useState(() => getStoredTheme() === 'dark');
 
     const showInstallApp = canOfferAppInstall();
 
-    // Efeito para sincronizar o tema com o DOM
+    const modulosAtivos = useMemo(() => {
+        if (!user) return [];
+        return MODULOS_ACESSO.filter((m) => user[m.key]);
+    }, [user]);
+
+    const avatarUrl = user
+        ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome)}&background=137fec&color=fff`
+        : 'https://ui-avatars.com/api/?name=Usuario&background=137fec&color=fff';
+
     useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-
-        // Atualiza a cor da barra do browser / iPhone
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', isDarkMode ? '#101022' : '#f6f7f8');
-        }
-
-        // Atualiza o estilo da barra de status do iOS (claro ou escuro)
-        const iosBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-        if (iosBarMeta) {
-            iosBarMeta.setAttribute('content', isDarkMode ? 'black-translucent' : 'default');
-        }
+        applyTheme(isDarkMode ? 'dark' : 'light');
     }, [isDarkMode]);
 
     const toggleDarkMode = () => {
@@ -47,20 +56,41 @@ const Settings = () => {
             <Header title="Configurações do Sistema" />
 
             <main className="max-w-md mx-auto p-4 space-y-6">
-                {/* User Profile Card (Refined) */}
-                <section className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 flex items-center shadow-sm">
+                <section className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 shadow-sm border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-blue-600/10 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-800">
-                            <img alt="Admin Avatar" className="w-full h-full object-cover" src="https://ui-avatars.com/api/?name=Admin&background=137fec&color=fff" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold leading-tight">Administrador</h2>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Gestor Financeiro</p>
+                        <div className="min-w-0 flex-1">
+                            {userLoading ? (
+                                <p className="text-sm text-slate-500">Carregando perfil…</p>
+                            ) : user ? (
+                                <>
+                                    <h2 className="text-lg font-bold leading-tight truncate">{user.nome}</h2>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                                    <span
+                                        className={`inline-block mt-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+                                            usuarioAtivo(user.situacao)
+                                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                                : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                        }`}
+                                    >
+                                        {usuarioAtivo(user.situacao) ? 'Ativo' : 'Inativo'}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <h2 className="text-lg font-bold leading-tight">Usuário</h2>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                        {userError?.message ?? 'Perfil indisponível'}
+                                    </p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </section>
 
-                {/* App Settings Section */}
+                {user && modulosAtivos.length === 0 && !userLoading && (
+                    <p className="text-xs text-slate-500 px-1">Nenhum módulo habilitado para este usuário.</p>
+                )}
+
                 <section className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">Ajustes do App</h3>
                     <div className="bg-white dark:bg-slate-900 rounded-lg divide-y divide-slate-100 dark:divide-slate-800 shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800">
@@ -75,7 +105,6 @@ const Settings = () => {
                                 <InstallAppButton />
                             </div>
                         )}
-                        {/* Dark Mode Toggle */}
                         <div className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-blue-600/10 text-blue-600 flex items-center justify-center">
@@ -86,6 +115,7 @@ const Settings = () => {
                                 <span className="font-medium">Modo Escuro</span>
                             </div>
                             <button
+                                type="button"
                                 onClick={toggleDarkMode}
                                 className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors duration-200 p-1 ${isDarkMode ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
                                     }`}
@@ -97,11 +127,9 @@ const Settings = () => {
                     </div>
                 </section>
 
-                {/* Integrations Section */}
                 <section className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">Integrações</h3>
                     <div className="bg-white dark:bg-slate-900 rounded-lg divide-y divide-slate-100 dark:divide-slate-800 shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800">
-                        {/* Banking API */}
                         <div className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700">
@@ -109,21 +137,18 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Oasys Pay</span>
-                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                                        Inativa
+                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isBankingActive ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                        {integrationsLoading ? '…' : isBankingActive ? 'Ativa' : 'Inativa'}
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                disabled
-                                aria-disabled="true"
-                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
+                            <div
+                                className={`relative flex h-6 w-11 items-center rounded-full p-1 ${isBankingActive ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                aria-hidden
                             >
-                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
-                            </button>
+                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${isBankingActive ? 'translate-x-5' : 'translate-x-0'}`} />
+                            </div>
                         </div>
-                        {/* Logistics */}
                         <div className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700">
@@ -131,21 +156,18 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Logística</span>
-                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                                        Inativa
+                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isLogisticsActive ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                        {integrationsLoading ? '…' : isLogisticsActive ? 'Ativa' : 'Inativa'}
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                disabled
-                                aria-disabled="true"
-                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
+                            <div
+                                className={`relative flex h-6 w-11 items-center rounded-full p-1 ${isLogisticsActive ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                aria-hidden
                             >
-                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
-                            </button>
+                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${isLogisticsActive ? 'translate-x-5' : 'translate-x-0'}`} />
+                            </div>
                         </div>
-                        {/* CRM */}
                         <div className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700">
@@ -153,19 +175,17 @@ const Settings = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-medium">Oasys CRM</span>
-                                    <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                                        Inativa
+                                    <span className={`text-[10px] font-bold uppercase tracking-wide ${isCRMActive ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                        {integrationsLoading ? '…' : isCRMActive ? 'Ativa' : 'Inativa'}
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                disabled
-                                aria-disabled="true"
-                                className="relative flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 p-1 opacity-50 dark:bg-slate-700"
+                            <div
+                                className={`relative flex h-6 w-11 items-center rounded-full p-1 ${isCRMActive ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}
+                                aria-hidden
                             >
-                                <div className="h-4 w-4 translate-x-0 rounded-full bg-white shadow-sm" />
-                            </button>
+                                <div className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${isCRMActive ? 'translate-x-5' : 'translate-x-0'}`} />
+                            </div>
                         </div>
                     </div>
                 </section>

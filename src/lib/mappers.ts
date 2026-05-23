@@ -10,6 +10,8 @@ import type { BankMovement } from '../types/finance';
 import type { PayableRow, ReceivableRow } from '../types/finance';
 import type { InventoryMovementDetail, InventoryMovementSummary, LowStockAlert, LowStockAlertFull, ProductRow } from '../types/inventory';
 import type { PendingIssue } from '../types/pending';
+import { estoqueTipoIsEntrada, estoqueTipoLabel, pedidoStatusColor, pedidoStatusLabel } from './constants';
+import { formatDateBr, formatDateTimeBr, parseApiDate } from './dates';
 import type { SalesHistoryOrder, SalesOrderPreview } from '../types/sales';
 
 export function formatCurrency(value: number): string {
@@ -47,7 +49,7 @@ function parcelaStatus(parcela: ParcelaFinanceira): { status: string; color: str
   if (parcela.saldo <= 0) {
     return { status: 'Pago', color: 'emerald' };
   }
-  const due = new Date(parcela.dataVencimento);
+  const due = parseApiDate(parcela.dataVencimento) ?? new Date(parcela.dataVencimento);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   if (due < today) {
@@ -91,7 +93,7 @@ export function mapParcelaToPendingIssue(parcela: ParcelaFinanceira, kind: 'paga
     numValue: amount,
     status,
     color,
-    date: parcela.dataVencimento,
+    date: formatDateBr(parcela.dataVencimento),
     details: parcela.tituloObservacao ?? parcela.tituloParcela,
   };
 }
@@ -100,26 +102,27 @@ export function mapPedidoRecenteToPreview(pedido: PedidoRecente): SalesOrderPrev
   const itemsSummary = pedido.itens
     .map((item) => `${item.quantidade}x ${item.produto.descricao}`)
     .join(', ');
-  const faturado = pedido.valorTotal > 0;
+  const { date, time } = formatDateTimeBr(pedido.dataEmissao);
+  const horario = pedido.tempoRelativo ?? (time || date);
   return {
     id: pedido.id,
     client: pedido.cliente.razaoSocial,
-    time: pedido.tempoRelativo ?? pedido.dataEmissao,
+    time: horario,
     value: formatCurrency(pedido.valorTotal),
-    status: faturado ? 'Faturado' : 'Pedido',
+    status: pedidoStatusLabel(pedido.status),
     items: itemsSummary || 'Sem itens',
     ref: `#${pedido.id}`,
-    color: faturado ? 'emerald' : 'blue',
+    color: pedidoStatusColor(pedido.status),
   };
 }
 
 export function mapPedidoRecenteToHistory(pedido: PedidoRecente): SalesHistoryOrder {
   const preview = mapPedidoRecenteToPreview(pedido);
-  const datePart = pedido.dataEmissao.split(' ')[0] ?? pedido.dataEmissao;
+  const { date, time } = formatDateTimeBr(pedido.dataEmissao);
   return {
     ...preview,
-    date: datePart,
-    tax: '—',
+    date,
+    time: pedido.tempoRelativo ?? (time || preview.time),
   };
 }
 
@@ -130,29 +133,23 @@ export function mapMovimentacaoFinanceiraToBankMovement(mov: MovimentacaoFinance
     id: mov.id,
     type: mov.pessoa?.razaoSocial ?? (isIncome ? 'Recebimento' : 'Pagamento'),
     method: mov.parcela.numero != null ? `Parcela ${mov.parcela.numero}` : 'Movimentação',
-    time: mov.tempoRelativo ?? mov.dataPagamento,
+    time: mov.tempoRelativo ?? (formatDateTimeBr(mov.dataPagamento).time || formatDateBr(mov.dataPagamento)),
     value: formatCurrency(Math.abs(signed)),
     isIncome,
-    date: mov.dataPagamento,
+    date: formatDateBr(mov.dataPagamento),
     ref: mov.titulo.id != null ? `Título ${mov.titulo.id}` : undefined,
     details: mov.observacao ?? undefined,
   };
 }
 
-const STOCK_TYPE_LABELS: Record<number, string> = {
-  1: 'Entrada',
-  2: 'Saída',
-  3: 'Ajuste',
-};
-
 export function mapMovimentacaoEstoqueToSummary(mov: MovimentacaoEstoque): InventoryMovementSummary {
-  const isEntry = mov.tipo === 1;
+  const isEntry = estoqueTipoIsEntrada(mov.tipo);
   const sign = isEntry ? '+' : '-';
   return {
     id: mov.id,
-    type: STOCK_TYPE_LABELS[mov.tipo] ?? `Tipo ${mov.tipo}`,
+    type: estoqueTipoLabel(mov.tipo),
     origin: mov.produto.descricao,
-    time: mov.tempoRelativo ?? mov.data,
+    time: mov.tempoRelativo ?? (formatDateTimeBr(mov.data).time || formatDateBr(mov.data)),
     quantity: `${sign}${mov.quantidade}`,
     isEntry,
   };
@@ -162,7 +159,7 @@ export function mapMovimentacaoEstoqueToDetail(mov: MovimentacaoEstoque): Invent
   const summary = mapMovimentacaoEstoqueToSummary(mov);
   return {
     ...summary,
-    date: mov.data,
+    date: formatDateBr(mov.data),
     unit: 'un',
     ref: mov.produto.sku ?? `SKU-${mov.produto.id}`,
     details: mov.observacao ?? mov.produto.descricao,

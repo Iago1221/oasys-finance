@@ -1,5 +1,7 @@
 /** Chaves de persistência local — alinhar com a API quando existir backend */
 export const STORAGE_KEYS = {
+  token: 'oasys-token',
+  userEmail: 'oasys-user-email',
   theme: 'theme',
   isBankingActive: 'isBankingActive',
   isLogisticsActive: 'isLogisticsActive',

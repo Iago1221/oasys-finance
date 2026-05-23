@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import { useSalesWorkspace } from '../hooks';
+import { pedidoStatusIcon } from '../lib/constants';
 import { formatCurrency } from '../lib/mappers';
 import type { SalesOrderPreview } from '../types/sales';
 
@@ -17,25 +18,6 @@ export default function Sales() {
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrderPreview | null>(null);
 
-  const handlePrint = (order: SalesOrderPreview) => {
-    const win = window.open('', '_blank');
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>Pedido ${order.ref}</title>
-      <style>body{font-family:sans-serif;padding:32px;color:#111}h2{margin-bottom:4px}p{margin:4px 0;font-size:14px}.label{font-size:11px;color:#888;text-transform:uppercase;margin-top:12px}</style>
-      </head><body>
-      <h2>Pedido ${order.ref}</h2>
-      <p class="label">Cliente</p><p>${order.client}</p>
-      <p class="label">Horário</p><p>${order.time}</p>
-      <p class="label">Valor</p><p>${order.value}</p>
-      <p class="label">Status</p><p>${order.status}</p>
-      <p class="label">Itens</p><p>${order.items}</p>
-      </body></html>
-    `);
-    win.document.close();
-    win.print();
-  };
-
   const maxPipeline = Math.max(
     resumo?.totalOrcamentos ?? 0,
     resumo?.totalPedidos ?? 0,
@@ -46,9 +28,7 @@ export default function Sales() {
 
   const pipelineTotal =
     (resumo?.totalOrcamentos ?? 0) +
-    (resumo?.totalPedidos ?? 0) +
-    (resumo?.totalPedidosConcluidos ?? 0) +
-    (resumo?.totalPedidosFaturados ?? 0);
+    (resumo?.totalPedidos ?? 0);
 
   const growth = resumo?.crescimentoPedidosConcluidos;
 
@@ -173,16 +153,12 @@ export default function Sales() {
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className={`size-10 rounded-full flex items-center justify-center ${
-                                order.color === 'emerald' ? 'bg-emerald-500/10' : 'bg-blue-500/10'
-                              }`}
+                              className={`size-10 rounded-full flex items-center justify-center bg-${order.color}-500/10`}
                             >
                               <span
-                                className={`material-symbols-outlined text-xl ${
-                                  order.color === 'emerald' ? 'text-emerald-500' : 'text-blue-500'
-                                }`}
+                                className={`material-symbols-outlined text-xl text-${order.color}-500`}
                               >
-                                {order.status === 'Faturado' ? 'check_circle' : 'receipt_long'}
+                                {pedidoStatusIcon(order.status)}
                               </span>
                             </div>
                             <div>
@@ -193,7 +169,10 @@ export default function Sales() {
                             </div>
                           </div>
                           <div className="text-right flex items-center gap-3">
-                            <p className="text-sm font-black">{order.value}</p>
+                            <div>
+                              <p className="text-sm font-black">{order.value}</p>
+                              <p className={`text-[9px] font-bold uppercase text-${order.color}-500`}>{order.status}</p>
+                            </div>
                             <span className="material-symbols-outlined text-slate-300">chevron_right</span>
                           </div>
                         </div>
@@ -201,22 +180,13 @@ export default function Sales() {
                         {expandedOrderId === order.id && (
                           <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 space-y-3">
                             <p className="text-xs text-slate-600 dark:text-slate-300 italic">{order.items}</p>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => setSelectedOrder(order)}
-                                className="flex-1 border border-slate-200 dark:border-slate-700 py-2 rounded-xl text-[10px] font-bold uppercase"
-                              >
-                                Ver Detalhes
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handlePrint(order)}
-                                className="flex-1 border border-slate-200 dark:border-slate-700 py-2 rounded-xl text-[10px] font-bold uppercase"
-                              >
-                                Imprimir
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedOrder(order)}
+                              className="w-full border border-slate-200 dark:border-slate-700 py-2 rounded-xl text-[10px] font-bold uppercase"
+                            >
+                              Ver Detalhes
+                            </button>
                           </div>
                         )}
                       </div>
@@ -234,19 +204,30 @@ export default function Sales() {
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
             <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl">
               <div className="flex justify-between mb-4">
-                <h4 className="text-lg font-black">{selectedOrder.client}</h4>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{selectedOrder.ref}</p>
+                  <h4 className="text-lg font-black">{selectedOrder.client}</h4>
+                </div>
                 <button type="button" onClick={() => setSelectedOrder(null)} className="material-symbols-outlined">
                   close
                 </button>
               </div>
-              <p className="text-sm mb-4">{selectedOrder.items}</p>
-              <button
-                type="button"
-                onClick={() => handlePrint(selectedOrder)}
-                className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm"
-              >
-                Imprimir Pedido
-              </button>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Valor</p>
+                    <p className="text-sm font-black">{selectedOrder.value}</p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
+                    <p className={`text-sm font-black text-${selectedOrder.color}-500`}>{selectedOrder.status}</p>
+                  </div>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Itens do Pedido</p>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 italic">{selectedOrder.items}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}

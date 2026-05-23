@@ -33,17 +33,8 @@ export type IssuedNoteRow = IssuedNotePreview & {
   date: string;
 };
 
-export type SalesHistoryOrder = {
-  id: number;
-  client: string;
+export type SalesHistoryOrder = SalesOrderPreview & {
   date: string;
-  time: string;
-  value: string;
-  status: string;
-  ref: string;
-  items: string;
-  tax: string;
-  color: string;
 };
 
 export type ActivityItem = {

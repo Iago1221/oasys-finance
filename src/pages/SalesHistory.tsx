@@ -3,31 +3,28 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import BackButton from '../components/BackButton';
 import { useSalesHistory } from '../hooks';
+import { pedidoStatusIcon } from '../lib/constants';
 import type { SalesHistoryOrder } from '../types/sales';
+
+function statusTextColor(status: string): string {
+    switch (status) {
+        case 'Concluído':
+            return 'text-emerald-500';
+        case 'Cancelado':
+            return 'text-red-500';
+        case 'Confirmado':
+            return 'text-indigo-500';
+        case 'Migrado':
+            return 'text-slate-500';
+        default:
+            return 'text-blue-500';
+    }
+}
 
 const SalesHistory = () => {
     const { orders, isLoading, error } = useSalesHistory();
     const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<SalesHistoryOrder | null>(null);
-
-    const handlePrint = (order: SalesHistoryOrder) => {
-        const win = window.open('', '_blank');
-        win.document.write(`
-            <html><head><title>Pedido ${order.ref}</title>
-            <style>body{font-family:sans-serif;padding:32px;color:#111}h2{margin-bottom:4px}p{margin:4px 0;font-size:14px}.label{font-size:11px;color:#888;text-transform:uppercase;margin-top:12px}</style>
-            </head><body>
-            <h2>Pedido ${order.ref}</h2>
-            <p class="label">Cliente</p><p>${order.client}</p>
-            <p class="label">Data</p><p>${order.date} às ${order.time}</p>
-            <p class="label">Valor</p><p>${order.value}</p>
-            <p class="label">Status</p><p>${order.status}</p>
-            <p class="label">Itens</p><p>${order.items}</p>
-            <p class="label">Impostos</p><p>${order.tax}</p>
-            </body></html>
-        `);
-        win.document.close();
-        win.print();
-    };
 
     const toggleDetails = (id: number) => {
         setExpandedOrderId(expandedOrderId === id ? null : id);
@@ -59,7 +56,7 @@ const SalesHistory = () => {
                                 <div className="flex items-center gap-3">
                                     <div className={`size-10 rounded-full bg-${order.color}-500/10 flex items-center justify-center`}>
                                         <span className={`material-symbols-outlined text-${order.color}-500 text-xl`}>
-                                            {order.status === 'Faturado' ? 'check_circle' : order.status === 'Cancelado' ? 'cancel' : 'receipt_long'}
+                                            {pedidoStatusIcon(order.status)}
                                         </span>
                                     </div>
                                     <div>
@@ -80,32 +77,17 @@ const SalesHistory = () => {
 
                             {expandedOrderId === order.id && (
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <div className="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <p className="text-[9px] uppercase font-bold text-slate-400">Itens do Pedido</p>
-                                            <p className="text-xs text-slate-600 dark:text-slate-300 italic">{order.items}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[9px] uppercase font-bold text-slate-400">Impostos Computados</p>
-                                            <p className="text-xs text-slate-600 dark:text-slate-300">{order.tax}</p>
-                                        </div>
+                                    <div className="mb-4">
+                                        <p className="text-[9px] uppercase font-bold text-slate-400">Itens do Pedido</p>
+                                        <p className="text-xs text-slate-600 dark:text-slate-300 italic">{order.items}</p>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setSelectedOrder(order)}
-                                            className="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 py-2.5 rounded-lg text-[10px] font-bold uppercase hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <span className="material-symbols-outlined text-base">visibility</span>
-                                            Ver Detalhes
-                                        </button>
-                                        <button
-                                            onClick={() => handlePrint(order)}
-                                            className="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 py-2.5 rounded-lg text-[10px] font-bold uppercase hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <span className="material-symbols-outlined text-base">print</span>
-                                            Imprimir
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => setSelectedOrder(order)}
+                                        className="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 py-2.5 rounded-lg text-[10px] font-bold uppercase hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-base">visibility</span>
+                                        Ver Detalhes
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -116,7 +98,6 @@ const SalesHistory = () => {
 
             <BottomNav />
 
-            {/* Modal Ver Detalhes */}
             {selectedOrder && (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
@@ -137,9 +118,7 @@ const SalesHistory = () => {
                                     </div>
                                     <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
-                                        <p className={`text-sm font-black ${selectedOrder.status === 'Faturado' ? 'text-emerald-500' :
-                                                selectedOrder.status === 'Cancelado' ? 'text-red-500' : 'text-blue-500'
-                                            }`}>{selectedOrder.status}</p>
+                                        <p className={`text-sm font-black ${statusTextColor(selectedOrder.status)}`}>{selectedOrder.status}</p>
                                     </div>
                                 </div>
 
@@ -152,20 +131,7 @@ const SalesHistory = () => {
                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Itens do Pedido</p>
                                     <p className="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed">{selectedOrder.items}</p>
                                 </div>
-
-                                <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Impostos Computados</p>
-                                    <p className="text-sm text-slate-700 dark:text-slate-300">{selectedOrder.tax}</p>
-                                </div>
                             </div>
-
-                            <button
-                                onClick={() => handlePrint(selectedOrder)}
-                                className="w-full mt-5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
-                            >
-                                <span className="material-symbols-outlined text-lg">print</span>
-                                Imprimir Pedido
-                            </button>
                         </div>
                     </div>
                 </div>

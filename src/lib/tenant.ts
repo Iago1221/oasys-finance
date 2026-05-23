@@ -1,9 +1,6 @@
-const BARE_HOSTS = new Set(['localhost', '127.0.0.1']);
+import { BASE_URL } from './config';
 
-function readEnv(key: string): string | undefined {
-  const value = import.meta.env[key];
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
+const BARE_HOSTS = new Set(['localhost', '127.0.0.1']);
 
 function isIpAddress(hostname: string): boolean {
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname) || hostname.includes(':');
@@ -11,6 +8,17 @@ function isIpAddress(hostname: string): boolean {
 
 function isLocalDevHost(hostname: string): boolean {
   return hostname === 'localhost' || hostname.endsWith('.localhost') || hostname === '127.0.0.1';
+}
+
+function isLocalBaseUrl(): boolean {
+  return BASE_URL.includes('localhost') || BASE_URL.startsWith('127.0.0.1');
+}
+
+function getProtocol(): string {
+  if (isLocalDevHost(window.location.hostname) || isLocalBaseUrl()) {
+    return 'http';
+  }
+  return 'https';
 }
 
 /**
@@ -58,29 +66,10 @@ export function getTenantPrefix(): string {
   return prefix;
 }
 
-function getApiRootDomain(): string {
-  const domain = readEnv('VITE_API_ROOT_DOMAIN');
-  if (!domain) {
-    throw new Error('VITE_API_ROOT_DOMAIN não configurado.');
-  }
-  return domain;
-}
-
-function getProtocol(): string {
-  const fromEnv = readEnv('VITE_API_PROTOCOL');
-  if (fromEnv) {
-    return fromEnv.replace(/:$/, '');
-  }
-  if (isLocalDevHost(window.location.hostname)) {
-    return 'http';
-  }
-  return 'https';
-}
-
-/** Origin do back-end: {protocol}://{tenant}.{VITE_API_ROOT_DOMAIN} */
+/** Origin do back-end: {protocol}://{tenant}.{BASE_URL} */
 export function getApiOrigin(): string {
   const prefix = getTenantPrefix();
-  return `${getProtocol()}://${prefix}.${getApiRootDomain()}`;
+  return `${getProtocol()}://${prefix}.${BASE_URL}`;
 }
 
 export function getFinanceBaseUrl(): string {
@@ -89,4 +78,8 @@ export function getFinanceBaseUrl(): string {
 
 export function getLoginUrl(): string {
   return `${getApiOrigin()}/api/login`;
+}
+
+export function getAppBaseUrl(): string {
+  return `${getApiOrigin()}/api/app`;
 }
