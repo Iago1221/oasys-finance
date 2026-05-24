@@ -40,14 +40,11 @@ export function useInventoryMonitor() {
   );
 
   const lowStockAlerts: LowStockAlert[] = useMemo(
-    () =>
-      (saldoQuery.data ?? [])
-        .map((p, i) => mapProdutoSaldoToLowStockAlert(p, i))
-        .filter((a): a is LowStockAlert => a != null),
+    () => (saldoQuery.data ?? []).map((p, i) => mapProdutoSaldoToLowStockAlert(p, i)),
     [saldoQuery.data],
   );
 
-  const activeItemsCount = itensQuery.data?.length ?? 0;
+  const activeItemsCount = itensQuery.data?.total ?? 0;
 
   const isLoading = movQuery.isLoading || saldoQuery.isLoading || itensQuery.isLoading;
   const error = movQuery.error ?? saldoQuery.error ?? itensQuery.error;

@@ -59,10 +59,8 @@ export type Deposito = {
   descricao: string;
 };
 
-export type ItemAtivo = {
-  id: number;
-  sku: string | null;
-  descricao: string;
+export type ItensAtivosTotal = {
+  total: number;
 };
 
 export type MovimentacaoEstoque = {

@@ -27,7 +27,7 @@ const LowStock = () => {
             <main className="px-4 space-y-4">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                        Identificamos {lowStockItems.length} itens abaixo do mínimo
+                        {lowStockItems.length} itens com menor saldo no depósito (até 20)
                     </span>
                 </div>
 

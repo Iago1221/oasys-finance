@@ -35,5 +35,5 @@ O back-end deve permitir a origem do front-end (CORS), por tenant, quando front 
 
 - Vendas: `vendaResumo`, `vendaFiscal`, `vendaPedidosRecentes`
 - Financeiro: `financeiroFluxoMes`, `financeiroContasPagar`, `financeiroContasReceber`, `financeiroMovimentacoesRecentes`
-- Estoque: `estoqueDepositos`, `estoqueItensAtivos`, `estoqueMovimentacoesRecentes`, `estoqueProdutosSaldo`
+- Estoque: `estoqueDepositos`, `estoqueItensAtivos` (`{ total }`), `estoqueMovimentacoesRecentes`, `estoqueProdutosSaldo` (até 20 itens ativos com menor saldo no depósito, ordenados)
 - Config: `configuracao` e POSTs de integração
