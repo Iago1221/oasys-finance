@@ -21,7 +21,7 @@ const InventoryList = () => {
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
                     <input
                         type="text"
-                        placeholder="Buscar por nome, SKU ou categoria..."
+                        placeholder="Buscar nos itens com menor saldo..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
@@ -32,7 +32,7 @@ const InventoryList = () => {
             <main className="px-4 space-y-3">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                        Total: {filteredProducts.length} itens encontrados
+                        {filteredProducts.length} de até 20 itens (menor saldo no depósito)
                     </span>
                 </div>
 

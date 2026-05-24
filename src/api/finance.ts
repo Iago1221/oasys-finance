@@ -5,7 +5,7 @@ import type {
   Deposito,
   FinanceAppConfig,
   FinanceiroFluxoMes,
-  ItemAtivo,
+  ItensAtivosTotal,
   MovimentacaoEstoque,
   MovimentacaoFinanceira,
   PedidoRecente,
@@ -26,7 +26,7 @@ export function createFinanceApi(
     getVendaFiscal: () => client.get<VendaFiscal>('vendaFiscal'),
     getVendaPedidosRecentes: () => client.get<PedidoRecente[]>('vendaPedidosRecentes'),
     getEstoqueDepositos: () => client.get<Deposito[]>('estoqueDepositos'),
-    getEstoqueItensAtivos: () => client.get<ItemAtivo[]>('estoqueItensAtivos'),
+    getEstoqueItensAtivos: () => client.get<ItensAtivosTotal>('estoqueItensAtivos'),
     getEstoqueMovimentacoesRecentes: (depositoId: number) =>
       client.get<MovimentacaoEstoque[]>('estoqueMovimentacoesRecentes', { deposito: depositoId }),
     getEstoqueProdutosSaldo: (depositoId: number) =>

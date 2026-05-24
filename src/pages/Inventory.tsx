@@ -72,10 +72,11 @@ export default function Inventory() {
           <div>
             <section className="px-4 py-4">
               <div className="flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm max-w-xs">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Itens Ativos</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Produtos ativos</span>
                 <p className="text-2xl font-black text-slate-900 dark:text-white">
                   {activeItemsCount.toLocaleString('pt-BR')}
                 </p>
+                <p className="text-[10px] text-slate-500 font-medium mt-0.5">no cadastro</p>
               </div>
             </section>
 

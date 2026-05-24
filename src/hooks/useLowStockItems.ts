@@ -20,10 +20,7 @@ export function useLowStockItems() {
   );
 
   const items: LowStockAlertFull[] = useMemo(
-    () =>
-      (query.data ?? [])
-        .map((p, i) => mapProdutoSaldoToLowStockFull(p, i))
-        .filter((a): a is LowStockAlertFull => a != null),
+    () => (query.data ?? []).map((p, i) => mapProdutoSaldoToLowStockFull(p, i)),
     [query.data],
   );
 

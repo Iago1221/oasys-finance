@@ -180,10 +180,7 @@ export function mapProdutoSaldoToProductRow(produto: ProdutoSaldo, index: number
 
 const LOW_STOCK_THRESHOLD = 10;
 
-export function mapProdutoSaldoToLowStockAlert(produto: ProdutoSaldo, index: number): LowStockAlert | null {
-  if (produto.saldo > LOW_STOCK_THRESHOLD) {
-    return null;
-  }
+export function mapProdutoSaldoToLowStockAlert(produto: ProdutoSaldo, index: number): LowStockAlert {
   return {
     id: produto.depositoItem || index,
     name: produto.descricao,
@@ -194,9 +191,8 @@ export function mapProdutoSaldoToLowStockAlert(produto: ProdutoSaldo, index: num
   };
 }
 
-export function mapProdutoSaldoToLowStockFull(produto: ProdutoSaldo, index: number): LowStockAlertFull | null {
+export function mapProdutoSaldoToLowStockFull(produto: ProdutoSaldo, index: number): LowStockAlertFull {
   const base = mapProdutoSaldoToLowStockAlert(produto, index);
-  if (!base) return null;
   const level = base.current <= 0 ? 'Crítico' : 'Baixo';
   const color = base.current <= 0 ? 'red' : 'amber';
   return { ...base, level, color };
