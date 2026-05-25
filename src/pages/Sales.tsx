@@ -26,9 +26,7 @@ export default function Sales() {
     1,
   );
 
-  const pipelineTotal =
-    (resumo?.totalOrcamentos ?? 0) +
-    (resumo?.totalPedidos ?? 0);
+  const pipelineTotal = (resumo?.totalPedidos ?? 0);
 
   const growth = resumo?.crescimentoPedidosConcluidos;
 
