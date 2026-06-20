@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-d
 import ProtectedRoute from './components/ProtectedRoute';
 import TenantGate from './components/TenantGate';
 import { AuthProvider } from './context/AuthContext';
+import { CompetenciaProvider } from './context/CompetenciaContext';
 import { DepositoProvider } from './context/DepositoContext';
 import Dashboard from './pages/Dashboard';
 import Finance from './pages/Finance';
@@ -25,6 +26,7 @@ function App() {
   return (
     <TenantGate>
       <AuthProvider>
+      <CompetenciaProvider>
       <Router>
         <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans">
           <Routes>
@@ -55,6 +57,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </CompetenciaProvider>
       </AuthProvider>
     </TenantGate>
   );

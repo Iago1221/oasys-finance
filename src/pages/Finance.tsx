@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
+import CompetenciaSelector from '../components/CompetenciaSelector';
 import { useNavigate } from 'react-router-dom';
 import { useFinanceCatalog, useFinanceFluxo, useWallet } from '../hooks';
 import { formatCurrency } from '../lib/mappers';
@@ -33,6 +34,7 @@ export default function Finance() {
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
       <div className="relative flex min-h-screen flex-col overflow-x-hidden pb-app">
         <Header title="Operações Financeiras" />
+        <CompetenciaSelector />
 
         {error && (
           <p className="mx-4 mt-4 text-sm text-red-600 bg-red-50 dark:bg-red-500/10 rounded-lg px-4 py-3">{error.message}</p>
