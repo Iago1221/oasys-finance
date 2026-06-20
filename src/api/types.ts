@@ -77,8 +77,10 @@ export type VendaFiscal = {
   nfeAutorizadas: number;
   nfceAutorizadas: number;
   countDfe: number;
+  valorDfe: number;
   xmlsPendentesManifestacao: number;
   countPagamentoDigital: number;
+  valorPagamentoDigital: number;
   diferencaFiscal: number;
 };
 

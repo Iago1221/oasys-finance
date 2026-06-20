@@ -141,24 +141,25 @@ export default function Sales() {
 
               {/* Malha Fiscal */}
               <section className="px-4 pb-2">
-                <h3 className="text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">Malha Fiscal</h3>
+                <h3 className="text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">TOTAIS DF-E</h3>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="rounded-2xl bg-white dark:bg-slate-900 p-4 border border-slate-100 dark:border-slate-800 shadow-sm text-center">
-                    <p className="text-xl font-black">{fiscal?.countPagamentoDigital ?? 0}</p>
+                    <p className="text-[13px] font-black leading-tight">{formatCurrency(fiscal?.valorPagamentoDigital ?? 0)}</p>
                     <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">Pgto Digital</p>
+                    <p className="text-[8px] text-slate-400 mt-0.5">{fiscal?.countPagamentoDigital ?? 0} pedidos</p>
                   </div>
                   <div className="rounded-2xl bg-white dark:bg-slate-900 p-4 border border-slate-100 dark:border-slate-800 shadow-sm text-center">
-                    <p className="text-xl font-black">{fiscal?.countDfe ?? 0}</p>
+                    <p className="text-[13px] font-black leading-tight">{formatCurrency(fiscal?.valorDfe ?? 0)}</p>
                     <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">Total DF-e</p>
-                    <p className="text-[8px] text-slate-400">{fiscal?.nfeAutorizadas ?? 0} NF-e · {fiscal?.nfceAutorizadas ?? 0} NFC-e</p>
+                    <p className="text-[8px] text-slate-400 mt-0.5">{fiscal?.nfeAutorizadas ?? 0} NF-e · {fiscal?.nfceAutorizadas ?? 0} NFC-e</p>
                   </div>
                   <div className={`rounded-2xl p-4 border shadow-sm text-center ${
                     (fiscal?.diferencaFiscal ?? 0) >= 0
                       ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20'
                       : 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20'
                   }`}>
-                    <p className={`text-xl font-black ${(fiscal?.diferencaFiscal ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {(fiscal?.diferencaFiscal ?? 0) >= 0 ? '+' : ''}{fiscal?.diferencaFiscal ?? 0}
+                    <p className={`text-[13px] font-black leading-tight ${(fiscal?.diferencaFiscal ?? 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {(fiscal?.diferencaFiscal ?? 0) >= 0 ? '+' : ''}{formatCurrency(Math.abs(fiscal?.diferencaFiscal ?? 0))}
                     </p>
                     <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">Diferença</p>
                   </div>
