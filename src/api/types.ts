@@ -19,17 +19,67 @@ export type VendaResumo = {
   totalPedidos: number;
   totalPedidosConcluidos: number;
   totalPedidosFaturados: number;
+  countPedidos: number;
+  countConcluidos: number;
   crescimentoPedidosConcluidos: {
     percentual: number;
-    mesAnterior: number;
+    /** @deprecated use anoAnterior */
+    mesAnterior?: number;
+    anoAnterior: number;
+    anoAnteriorFull: number;
     mesAtual: number;
+    diasDecorridos: number;
+    isProporcional: boolean;
   };
+};
+
+export type VendaDetalhada = {
+  periodo: Periodo;
+  countPedidos: number;
+  countConcluidos: number;
+  totalVendido: number;
+  totalConcluidos: number;
+  ticketMedio: number;
+};
+
+export type ProdutoRanking = {
+  id: number;
+  sku: string | null;
+  descricao: string;
+  qtdVendida: number;
+  valorVendido: number;
+};
+
+export type VendaRankingProdutos = {
+  periodo: Periodo;
+  ranking: ProdutoRanking[];
+};
+
+export type CategoriaVenda = {
+  categoria: string;
+  valor: number;
+  percentual: number;
+};
+
+export type VendasPorCategoria = {
+  periodo: Periodo;
+  total: number;
+  categorias: CategoriaVenda[];
+};
+
+export type Vendedor = {
+  id: number;
+  nome: string;
 };
 
 export type VendaFiscal = {
   periodo: Periodo;
   nfeAutorizadas: number;
+  nfceAutorizadas: number;
+  countDfe: number;
   xmlsPendentesManifestacao: number;
+  countPagamentoDigital: number;
+  diferencaFiscal: number;
 };
 
 export type PedidoRecente = {
@@ -122,11 +172,44 @@ export type ParcelaFinanceira = {
 export type ContasPagarResponse = {
   periodo: Periodo;
   parcelas: ParcelaFinanceira[];
+  venceEm7Dias: number;
 };
 
 export type ContasReceberResponse = {
   periodo: Periodo;
   parcelas: ParcelaFinanceira[];
+  previsto7Dias: number;
+};
+
+export type EstoqueValorCusto = {
+  depositoId: number | null;
+  valorCusto: number;
+  porDeposito?: Array<{ depositoId: number; valor: number }>;
+};
+
+export type EstoqueValorVenda = {
+  depositoId: number | null;
+  tabelaPrecoId: number | null;
+  valorVenda: number;
+};
+
+export type ProdutoSemMovimentacao = {
+  id: number;
+  sku: string | null;
+  descricao: string;
+  saldo: number;
+  diasSemMovimentacao: number | null;
+};
+
+export type EstoqueProdutosSemMovimentacao = {
+  periodo: Periodo;
+  produtos: ProdutoSemMovimentacao[];
+};
+
+export type EstoqueEntradasSaidas = {
+  periodo: Periodo;
+  entradas: number;
+  saidas: number;
 };
 
 export type MovimentacaoFinanceira = {
