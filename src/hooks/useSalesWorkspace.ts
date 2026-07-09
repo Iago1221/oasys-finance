@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFinanceApi } from '../context/AuthContext';
 import { useCompetencia } from '../context/CompetenciaContext';
 import type { VendaDetalhada, VendaFiscal, VendaRankingProdutos, VendasPorCategoria, VendaResumo, Vendedor } from '../api/types';
@@ -18,13 +18,21 @@ export function useSalesWorkspace() {
   const vendasQuery = useApiQuery<VendaDetalhada>(() => api.getVendas(competencia, vendedorId), [competencia, vendedorId]);
   const rankingQuery = useApiQuery<VendaRankingProdutos>(() => api.getVendaRankingProdutos(competencia, vendedorId), [competencia, vendedorId]);
   const categoriaQuery = useApiQuery<VendasPorCategoria>(() => api.getVendaVendasPorCategoria(competencia, vendedorId), [competencia, vendedorId]);
-  const vendedoresQuery = useApiQuery<Vendedor[]>(() => api.getVendaVendedores(), []);
+  const vendedoresQuery = useApiQuery<Vendedor[]>(() => api.getVendaVendedores(competencia), [competencia]);
   const pedidosQuery = useApiQuery(() => api.getVendaPedidosRecentes(), []);
 
   const highValueOrders: SalesOrderPreview[] = useMemo(
     () => (pedidosQuery.data ?? []).map(mapPedidoRecenteToPreview),
     [pedidosQuery.data],
   );
+
+  useEffect(() => {
+    if (vendedorId == null) return;
+    const vendedores = vendedoresQuery.data ?? [];
+    if (vendedores.length > 0 && !vendedores.some((v) => v.id === vendedorId)) {
+      setVendedorId(undefined);
+    }
+  }, [vendedoresQuery.data, vendedorId]);
 
   const isLoading = resumoQuery.isLoading || fiscalQuery.isLoading || vendasQuery.isLoading;
   const error = resumoQuery.error ?? fiscalQuery.error ?? vendasQuery.error ?? rankingQuery.error ?? categoriaQuery.error;

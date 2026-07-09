@@ -39,6 +39,8 @@ export type VendaDetalhada = {
   countConcluidos: number;
   totalVendido: number;
   totalConcluidos: number;
+  totalTrocas: number;
+  totalBonificacoes: number;
   ticketMedio: number;
 };
 
