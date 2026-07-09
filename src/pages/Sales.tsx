@@ -124,6 +124,16 @@ export default function Sales() {
                   <p className="text-[10px] text-slate-400 mt-1">
                     Concluídos: {formatCurrency(vendas?.totalConcluidos ?? 0)}
                   </p>
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Trocas</p>
+                      <p className="text-sm font-black mt-0.5">{formatCurrency(vendas?.totalTrocas ?? 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Bonificações</p>
+                      <p className="text-sm font-black mt-0.5">{formatCurrency(vendas?.totalBonificacoes ?? 0)}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col">

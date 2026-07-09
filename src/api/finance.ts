@@ -51,7 +51,8 @@ export function createFinanceApi(
         ...(competencia ? { competencia } : {}),
         ...(vendedor != null ? { vendedor } : {}),
       }),
-    getVendaVendedores: () => client.get<Vendedor[]>('vendaVendedores'),
+    getVendaVendedores: (competencia?: string) =>
+      client.get<Vendedor[]>('vendaVendedores', competencia ? { competencia } : undefined),
 
     // --- Estoque ---
     getEstoqueDepositos: () => client.get<Deposito[]>('estoqueDepositos'),
