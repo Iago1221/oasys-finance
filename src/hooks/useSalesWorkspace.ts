@@ -17,6 +17,7 @@ export function useSalesWorkspace() {
   const fiscalQuery = useApiQuery<VendaFiscal>(() => api.getVendaFiscal(competencia), [competencia]);
   const vendasQuery = useApiQuery<VendaDetalhada>(() => api.getVendas(competencia, vendedorId), [competencia, vendedorId]);
   const rankingQuery = useApiQuery<VendaRankingProdutos>(() => api.getVendaRankingProdutos(competencia, vendedorId), [competencia, vendedorId]);
+  const rankingValorQuery = useApiQuery<VendaRankingProdutos>(() => api.getVendaRankingProdutosValor(competencia, vendedorId), [competencia, vendedorId]);
   const categoriaQuery = useApiQuery<VendasPorCategoria>(() => api.getVendaVendasPorCategoria(competencia, vendedorId), [competencia, vendedorId]);
   const vendedoresQuery = useApiQuery<Vendedor[]>(() => api.getVendaVendedores(competencia), [competencia]);
   const pedidosQuery = useApiQuery(() => api.getVendaPedidosRecentes(), []);
@@ -35,13 +36,14 @@ export function useSalesWorkspace() {
   }, [vendedoresQuery.data, vendedorId]);
 
   const isLoading = resumoQuery.isLoading || fiscalQuery.isLoading || vendasQuery.isLoading;
-  const error = resumoQuery.error ?? fiscalQuery.error ?? vendasQuery.error ?? rankingQuery.error ?? categoriaQuery.error;
+  const error = resumoQuery.error ?? fiscalQuery.error ?? vendasQuery.error ?? rankingQuery.error ?? rankingValorQuery.error ?? categoriaQuery.error;
 
   return {
     resumo: resumoQuery.data,
     fiscal: fiscalQuery.data,
     vendas: vendasQuery.data,
     ranking: rankingQuery.data,
+    rankingValor: rankingValorQuery.data,
     categorias: categoriaQuery.data,
     vendedores: vendedoresQuery.data ?? [],
     vendedorId,
@@ -49,6 +51,7 @@ export function useSalesWorkspace() {
     highValueOrders,
     isLoading,
     rankingLoading: rankingQuery.isLoading,
+    rankingValorLoading: rankingValorQuery.isLoading,
     categoriaLoading: categoriaQuery.isLoading,
     error,
   };
