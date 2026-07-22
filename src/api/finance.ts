@@ -46,6 +46,11 @@ export function createFinanceApi(
         ...(competencia ? { competencia } : {}),
         ...(vendedor != null ? { vendedor } : {}),
       }),
+    getVendaRankingProdutosValor: (competencia?: string, vendedor?: number) =>
+      client.get<VendaRankingProdutos>('vendaRankingProdutosValor', {
+        ...(competencia ? { competencia } : {}),
+        ...(vendedor != null ? { vendedor } : {}),
+      }),
     getVendaVendasPorCategoria: (competencia?: string, vendedor?: number) =>
       client.get<VendasPorCategoria>('vendaVendasPorCategoria', {
         ...(competencia ? { competencia } : {}),

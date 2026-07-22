@@ -66,6 +66,7 @@ export default function Sales() {
     fiscal,
     vendas,
     ranking,
+    rankingValor,
     categorias,
     vendedores,
     vendedorId,
@@ -73,11 +74,16 @@ export default function Sales() {
     highValueOrders,
     isLoading,
     rankingLoading,
+    rankingValorLoading,
     categoriaLoading,
     error,
   } = useSalesWorkspace();
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrderPreview | null>(null);
+  const [rankingMode, setRankingMode] = useState<'quantidade' | 'valor'>('quantidade');
+
+  const rankingAtual = rankingMode === 'quantidade' ? ranking : rankingValor;
+  const rankingAtualLoading = rankingMode === 'quantidade' ? rankingLoading : rankingValorLoading;
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
@@ -178,14 +184,40 @@ export default function Sales() {
 
               {/* Ranking de Produtos */}
               <section className="px-4 py-4">
-                <h3 className="text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">Top 10 Produtos</h3>
-                {rankingLoading ? (
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Top 10 Produtos</h3>
+                  <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setRankingMode('quantidade')}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors ${
+                        rankingMode === 'quantidade'
+                          ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      Qtd.
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRankingMode('valor')}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest transition-colors ${
+                        rankingMode === 'valor'
+                          ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      Valor
+                    </button>
+                  </div>
+                </div>
+                {rankingAtualLoading ? (
                   <p className="text-sm text-slate-500 text-center py-4">Carregando…</p>
-                ) : !ranking?.ranking?.length ? (
+                ) : !rankingAtual?.ranking?.length ? (
                   <p className="text-sm text-slate-500 text-center py-4">Sem dados para o período.</p>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
-                    {ranking.ranking.map((p, i) => (
+                    {rankingAtual.ranking.map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3 px-4 py-3 border-b last:border-0 border-slate-50 dark:border-slate-800/50">
                         <span className="text-[11px] font-black text-slate-400 w-5 text-center flex-none">{i + 1}</span>
                         <div className="min-w-0 flex-1">
@@ -193,8 +225,17 @@ export default function Sales() {
                           <p className="text-[10px] text-slate-400 font-mono">{p.sku ?? '—'}</p>
                         </div>
                         <div className="text-right flex-none">
-                          <p className="text-[12px] font-black">{p.qtdVendida} un.</p>
-                          <p className="text-[10px] text-slate-400">{formatCurrency(p.valorVendido)}</p>
+                          {rankingMode === 'quantidade' ? (
+                            <>
+                              <p className="text-[12px] font-black">{p.qtdVendida} un.</p>
+                              <p className="text-[10px] text-slate-400">{formatCurrency(p.valorVendido)}</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-[12px] font-black">{formatCurrency(p.valorVendido)}</p>
+                              <p className="text-[10px] text-slate-400">{p.qtdVendida} un.</p>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
