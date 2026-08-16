@@ -18,6 +18,7 @@ import type {
   VendaFiscal,
   VendaRankingProdutos,
   VendasPorCategoria,
+  VendasPorTabelaPreco,
   VendaResumo,
   Vendedor,
 } from './types';
@@ -53,6 +54,11 @@ export function createFinanceApi(
       }),
     getVendaVendasPorCategoria: (competencia?: string, vendedor?: number) =>
       client.get<VendasPorCategoria>('vendaVendasPorCategoria', {
+        ...(competencia ? { competencia } : {}),
+        ...(vendedor != null ? { vendedor } : {}),
+      }),
+    getVendaVendasPorTabelaPreco: (competencia?: string, vendedor?: number) =>
+      client.get<VendasPorTabelaPreco>('vendaVendasPorTabelaPreco', {
         ...(competencia ? { competencia } : {}),
         ...(vendedor != null ? { vendedor } : {}),
       }),

@@ -173,6 +173,7 @@ export function mapProdutoSaldoToProductRow(produto: ProdutoSaldo, index: number
     sku: produto.sku ?? '—',
     category: 'Estoque',
     balance: produto.saldo,
+    projectedBalance: produto.saldoPrevisto,
     unit: produto.unidadeMedida ?? 'un',
     image: `https://ui-avatars.com/api/?name=${encodeURIComponent(produto.descricao.slice(0, 2))}&background=e2e8f0&color=475569`,
   };
@@ -186,6 +187,7 @@ export function mapProdutoSaldoToLowStockAlert(produto: ProdutoSaldo, index: num
     name: produto.descricao,
     sku: produto.sku ?? '—',
     current: produto.saldo,
+    projected: produto.saldoPrevisto,
     min: LOW_STOCK_THRESHOLD,
     image: `https://ui-avatars.com/api/?name=${encodeURIComponent(produto.descricao.slice(0, 2))}&background=fee2e2&color=b91c1c`,
   };

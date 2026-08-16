@@ -3,6 +3,7 @@ export type LowStockAlert = {
   name: string;
   sku: string;
   current: number;
+  projected: number;
   min: number;
   image: string;
 };
@@ -40,6 +41,7 @@ export type ProductRow = {
   sku: string;
   category: string;
   balance: number;
+  projectedBalance: number;
   unit: string;
   image: string;
 };

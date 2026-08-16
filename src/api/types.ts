@@ -69,6 +69,18 @@ export type VendasPorCategoria = {
   categorias: CategoriaVenda[];
 };
 
+export type TabelaPrecoVenda = {
+  tabelaPreco: string;
+  valor: number;
+  percentual: number;
+};
+
+export type VendasPorTabelaPreco = {
+  periodo: Periodo;
+  total: number;
+  tabelasPreco: TabelaPrecoVenda[];
+};
+
 export type Vendedor = {
   id: number;
   nome: string;
@@ -138,6 +150,8 @@ export type ProdutoSaldo = {
   descricao: string;
   unidadeMedida: string | null;
   saldo: number;
+  reservado: number;
+  saldoPrevisto: number;
 };
 
 export type FinanceiroFluxoMes = {
@@ -188,7 +202,8 @@ export type ContasReceberResponse = {
 export type EstoqueValorCusto = {
   depositoId: number | null;
   valorCusto: number;
-  porDeposito?: Array<{ depositoId: number; valor: number }>;
+  valorPrevisto: number;
+  porDeposito?: Array<{ depositoId: number; valor: number; valorPrevisto: number }>;
 };
 
 export type EstoqueValorVenda = {
@@ -202,6 +217,7 @@ export type ProdutoSemMovimentacao = {
   sku: string | null;
   descricao: string;
   saldo: number;
+  saldoPrevisto: number;
   diasSemMovimentacao: number | null;
 };
 

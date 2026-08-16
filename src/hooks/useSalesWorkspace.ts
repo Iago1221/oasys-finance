@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFinanceApi } from '../context/AuthContext';
 import { useCompetencia } from '../context/CompetenciaContext';
-import type { VendaDetalhada, VendaFiscal, VendaRankingProdutos, VendasPorCategoria, VendaResumo, Vendedor } from '../api/types';
+import type { VendaDetalhada, VendaFiscal, VendaRankingProdutos, VendasPorCategoria, VendasPorTabelaPreco, VendaResumo, Vendedor } from '../api/types';
 import { mapPedidoRecenteToPreview } from '../lib/mappers';
 import type { SalesOrderPreview } from '../types/sales';
 import { useApiQuery } from './useApiQuery';
@@ -19,6 +19,7 @@ export function useSalesWorkspace() {
   const rankingQuery = useApiQuery<VendaRankingProdutos>(() => api.getVendaRankingProdutos(competencia, vendedorId), [competencia, vendedorId]);
   const rankingValorQuery = useApiQuery<VendaRankingProdutos>(() => api.getVendaRankingProdutosValor(competencia, vendedorId), [competencia, vendedorId]);
   const categoriaQuery = useApiQuery<VendasPorCategoria>(() => api.getVendaVendasPorCategoria(competencia, vendedorId), [competencia, vendedorId]);
+  const tabelaPrecoQuery = useApiQuery<VendasPorTabelaPreco>(() => api.getVendaVendasPorTabelaPreco(competencia, vendedorId), [competencia, vendedorId]);
   const vendedoresQuery = useApiQuery<Vendedor[]>(() => api.getVendaVendedores(competencia), [competencia]);
   const pedidosQuery = useApiQuery(() => api.getVendaPedidosRecentes(), []);
 
@@ -36,7 +37,7 @@ export function useSalesWorkspace() {
   }, [vendedoresQuery.data, vendedorId]);
 
   const isLoading = resumoQuery.isLoading || fiscalQuery.isLoading || vendasQuery.isLoading;
-  const error = resumoQuery.error ?? fiscalQuery.error ?? vendasQuery.error ?? rankingQuery.error ?? rankingValorQuery.error ?? categoriaQuery.error;
+  const error = resumoQuery.error ?? fiscalQuery.error ?? vendasQuery.error ?? rankingQuery.error ?? rankingValorQuery.error ?? categoriaQuery.error ?? tabelaPrecoQuery.error;
 
   return {
     resumo: resumoQuery.data,
@@ -45,6 +46,7 @@ export function useSalesWorkspace() {
     ranking: rankingQuery.data,
     rankingValor: rankingValorQuery.data,
     categorias: categoriaQuery.data,
+    tabelasPreco: tabelaPrecoQuery.data,
     vendedores: vendedoresQuery.data ?? [],
     vendedorId,
     setVendedorId,
@@ -53,6 +55,7 @@ export function useSalesWorkspace() {
     rankingLoading: rankingQuery.isLoading,
     rankingValorLoading: rankingValorQuery.isLoading,
     categoriaLoading: categoriaQuery.isLoading,
+    tabelaPrecoLoading: tabelaPrecoQuery.isLoading,
     error,
   };
 }

@@ -96,7 +96,7 @@ export default function Inventory() {
         ) : (
           <div>
             {/* Cards de valor */}
-            <section className="px-4 py-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <section className="px-4 py-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
               <div className="flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Produtos Ativos</span>
                 <p className="text-2xl font-black">{activeItemsCount.toLocaleString('pt-BR')}</p>
@@ -111,6 +111,16 @@ export default function Inventory() {
                   <p className="text-2xl font-black">{formatCurrency(valorCusto?.valorCusto ?? 0)}</p>
                 )}
                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">custo médio em estoque</p>
+              </div>
+
+              <div className="flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Valor Previsto</span>
+                {valorCustoLoading ? (
+                  <p className="text-sm text-slate-400">…</p>
+                ) : (
+                  <p className="text-2xl font-black">{formatCurrency(valorCusto?.valorPrevisto ?? 0)}</p>
+                )}
+                <p className="text-[10px] text-slate-500 font-medium mt-0.5">custo médio descontando reservados</p>
               </div>
 
               <div className="flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
@@ -158,6 +168,7 @@ export default function Inventory() {
                       <div className="text-right flex-none">
                         <p className="text-sm font-black text-red-500">{item.current} uni</p>
                         <p className="text-[10px] text-slate-400 font-bold uppercase">Mín: {item.min}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">Previsto: {item.projected}</p>
                       </div>
                     </div>
                   ))
@@ -181,6 +192,7 @@ export default function Inventory() {
                       </div>
                       <div className="text-right flex-none">
                         <p className="text-[12px] font-black">{p.saldo.toLocaleString('pt-BR')} un.</p>
+                        <p className="text-[10px] text-slate-400 font-bold">Previsto: {p.saldoPrevisto.toLocaleString('pt-BR')}</p>
                         {p.diasSemMovimentacao != null && (
                           <p className="text-[10px] text-amber-500 font-bold">{p.diasSemMovimentacao}d sem mov.</p>
                         )}
