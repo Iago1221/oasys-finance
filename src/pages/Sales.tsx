@@ -7,29 +7,34 @@ import { useSalesWorkspace } from '../hooks';
 import { pedidoStatusIcon } from '../lib/constants';
 import { formatCurrency } from '../lib/mappers';
 import type { SalesOrderPreview } from '../types/sales';
-import type { CategoriaVenda } from '../api/types';
 
 const PIE_COLORS = [
   '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
   '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6b7280',
 ];
 
-function PieChart({ categorias }: { categorias: CategoriaVenda[] }) {
-  const top = categorias.slice(0, 8);
+type PieChartItem = {
+  label: string;
+  valor: number;
+  percentual: number;
+};
+
+function PieChart({ items }: { items: PieChartItem[] }) {
+  const top = items.slice(0, 8);
   let cumulative = 0;
 
   return (
     <div className="flex flex-col gap-3">
       <svg viewBox="0 0 200 200" className="w-40 h-40 mx-auto -rotate-90">
-        {top.map((cat, i) => {
-          const pct = cat.percentual / 100;
+        {top.map((item, i) => {
+          const pct = item.percentual / 100;
           const offset = cumulative;
           cumulative += pct;
           const r = 80;
           const circumference = 2 * Math.PI * r;
           return (
             <circle
-              key={cat.categoria}
+              key={item.label}
               cx="100"
               cy="100"
               r={r}
@@ -43,15 +48,15 @@ function PieChart({ categorias }: { categorias: CategoriaVenda[] }) {
         })}
       </svg>
       <div className="space-y-1.5">
-        {top.map((cat, i) => (
-          <div key={cat.categoria} className="flex items-center justify-between text-[11px]">
+        {top.map((item, i) => (
+          <div key={item.label} className="flex items-center justify-between text-[11px]">
             <div className="flex items-center gap-2 min-w-0">
               <span className="size-2.5 rounded-full flex-none" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-              <span className="text-slate-700 dark:text-slate-300 truncate">{cat.categoria}</span>
+              <span className="text-slate-700 dark:text-slate-300 truncate">{item.label}</span>
             </div>
             <div className="flex items-center gap-2 flex-none ml-2">
-              <span className="text-slate-500 font-mono">{cat.percentual.toFixed(1)}%</span>
-              <span className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(cat.valor)}</span>
+              <span className="text-slate-500 font-mono">{item.percentual.toFixed(1)}%</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(item.valor)}</span>
             </div>
           </div>
         ))}
@@ -68,6 +73,7 @@ export default function Sales() {
     ranking,
     rankingValor,
     categorias,
+    tabelasPreco,
     vendedores,
     vendedorId,
     setVendedorId,
@@ -76,6 +82,7 @@ export default function Sales() {
     rankingLoading,
     rankingValorLoading,
     categoriaLoading,
+    tabelaPrecoLoading,
     error,
   } = useSalesWorkspace();
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
@@ -252,7 +259,21 @@ export default function Sales() {
                   <p className="text-sm text-slate-500 text-center py-4">Sem dados para o período.</p>
                 ) : (
                   <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
-                    <PieChart categorias={categorias.categorias} />
+                    <PieChart items={categorias.categorias.map((c) => ({ label: c.categoria, valor: c.valor, percentual: c.percentual }))} />
+                  </div>
+                )}
+              </section>
+
+              {/* Vendas por Tabela de Preço */}
+              <section className="px-4 py-2">
+                <h3 className="text-[10px] font-black text-slate-400 mb-3 px-1 uppercase tracking-widest">Vendas por Tabela de Preço</h3>
+                {tabelaPrecoLoading ? (
+                  <p className="text-sm text-slate-500 text-center py-4">Carregando…</p>
+                ) : !tabelasPreco?.tabelasPreco?.length ? (
+                  <p className="text-sm text-slate-500 text-center py-4">Sem dados para o período.</p>
+                ) : (
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm">
+                    <PieChart items={tabelasPreco.tabelasPreco.map((t) => ({ label: t.tabelaPreco, valor: t.valor, percentual: t.percentual }))} />
                   </div>
                 )}
               </section>

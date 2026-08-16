@@ -54,6 +54,7 @@ const LowStock = () => {
                                 <div className="text-right flex-none">
                                     <p className={`text-sm font-black text-${item.color === 'red' ? 'red' : 'yellow'}-500`}>{item.current} uni</p>
                                     <p className="text-[10px] text-slate-400 font-medium">Mínimo: {item.min}</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Previsto: {item.projected}</p>
                                 </div>
                             </div>
 

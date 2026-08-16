@@ -52,6 +52,8 @@ const InventoryList = () => {
                             <div className="text-right flex-none">
                                 <p className="text-[9px] uppercase font-bold text-slate-400 mb-0.5 tracking-tighter">Saldo Atual</p>
                                 <p className="text-lg font-black text-slate-900 dark:text-white leading-none">{p.balance}</p>
+                                <p className="text-[9px] uppercase font-bold text-slate-400 mt-1.5 mb-0.5 tracking-tighter">Previsto</p>
+                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-none">{p.projectedBalance}</p>
                             </div>
                         </div>
 
