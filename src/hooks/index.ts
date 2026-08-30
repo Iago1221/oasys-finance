@@ -1,6 +1,8 @@
 export { useDashboardSummary } from './useDashboardSummary';
 export { useFinanceCatalog } from './useFinanceCatalog';
 export { useFinanceFluxo } from './useFinanceFluxo';
+export { useFinanceSaldosPorConta } from './useFinanceSaldosPorConta';
+export { useFinanceRecebimentosPagamentosPorConta } from './useFinanceRecebimentosPagamentosPorConta';
 export { useIntegrations, useIntegrationsReadOnly } from './useIntegrations';
 export { useInventoryMonitor } from './useInventoryMonitor';
 export { useLowStockItems } from './useLowStockItems';

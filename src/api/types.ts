@@ -168,6 +168,24 @@ export type FinanceiroFluxoMes = {
   };
 };
 
+export type SaldoConta = {
+  id: number;
+  descricao: string;
+  saldo: number;
+};
+
+export type RecebimentoPagamentoConta = {
+  id: number;
+  descricao: string;
+  recebimentos: number;
+  pagamentos: number;
+};
+
+export type RecebimentosPagamentosPorContaResponse = {
+  periodo: Periodo;
+  contas: RecebimentoPagamentoConta[];
+};
+
 export type ParcelaFinanceira = {
   tituloId: number;
   parcelaId: number;

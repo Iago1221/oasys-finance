@@ -14,6 +14,8 @@ import type {
   MovimentacaoFinanceira,
   PedidoRecente,
   ProdutoSaldo,
+  RecebimentosPagamentosPorContaResponse,
+  SaldoConta,
   VendaDetalhada,
   VendaFiscal,
   VendaRankingProdutos,
@@ -96,6 +98,13 @@ export function createFinanceApi(
       client.get<ContasReceberResponse>('financeiroContasReceber', competencia ? { competencia } : undefined),
     getFinanceiroMovimentacoesRecentes: () =>
       client.get<MovimentacaoFinanceira[]>('financeiroMovimentacoesRecentes'),
+    getFinanceiroSaldosPorConta: () =>
+      client.get<SaldoConta[]>('financeiroSaldosPorConta'),
+    getFinanceiroRecebimentosPagamentosPorConta: (competencia?: string) =>
+      client.get<RecebimentosPagamentosPorContaResponse>(
+        'financeiroRecebimentosPagamentosPorConta',
+        competencia ? { competencia } : undefined,
+      ),
 
     // --- Configuração ---
     getConfiguracao: () => client.get<FinanceAppConfig>('configuracao'),

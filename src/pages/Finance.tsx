@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import CompetenciaSelector from '../components/CompetenciaSelector';
+import AccountBalancesChart from '../components/AccountBalancesChart';
+import AccountFlowChart from '../components/AccountFlowChart';
 import { useNavigate } from 'react-router-dom';
-import { useFinanceCatalog, useFinanceFluxo, useWallet } from '../hooks';
+import { useFinanceCatalog, useFinanceFluxo, useFinanceRecebimentosPagamentosPorConta, useFinanceSaldosPorConta, useWallet } from '../hooks';
 import { formatCurrency } from '../lib/mappers';
 
 const borderColorClass: Record<string, string> = {
@@ -23,10 +25,12 @@ export default function Finance() {
   const { payables, receivables, isLoading: catalogLoading, error: catalogError } = useFinanceCatalog();
   const { data: fluxo, isLoading: fluxoLoading, error: fluxoError } = useFinanceFluxo();
   const { movements, isLoading: movLoading, error: movError } = useWallet();
+  const { contas: saldosPorConta, isLoading: saldosLoading, error: saldosError } = useFinanceSaldosPorConta();
+  const { contas: fluxoPorConta, isLoading: fluxoPorContaLoading, error: fluxoPorContaError } = useFinanceRecebimentosPagamentosPorConta();
   const [isValuesVisible, setIsValuesVisible] = useState(true);
 
   const isLoading = catalogLoading || fluxoLoading || movLoading;
-  const error = catalogError ?? fluxoError ?? movError;
+  const error = catalogError ?? fluxoError ?? movError ?? saldosError ?? fluxoPorContaError;
 
   const mask = (value: string) => (isValuesVisible ? value : 'R$ •••••');
 
@@ -82,6 +86,20 @@ export default function Finance() {
           </div>
         </div>
 
+
+        <div className="px-4 pt-2">
+          <div className="rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 className="text-base font-bold mb-4">Saldos por Conta</h3>
+            <AccountBalancesChart contas={saldosPorConta} isLoading={saldosLoading} mask={mask} />
+          </div>
+        </div>
+
+        <div className="px-4 pt-4">
+          <div className="rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 className="text-base font-bold mb-4">Recebimentos e Pagamentos por Conta</h3>
+            <AccountFlowChart contas={fluxoPorConta} isLoading={fluxoPorContaLoading} mask={mask} />
+          </div>
+        </div>
 
         <div className="px-4 pt-6">
           <div className="flex items-center justify-between mb-3">
